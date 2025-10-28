@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Send } from 'lucide-react'
-import { useRunRequest } from '../hooks/request'
+import { useRunRequest, useUpdateRequest } from '../hooks/request'
 import { toast } from 'sonner'
 
 interface Props {
@@ -24,6 +24,8 @@ interface Props {
 const RequestBar = ({ tab, updateTab }: Props) => {
 
   const {mutateAsync , isPending , isError} = useRunRequest(tab?.requestId!);
+  const updateRequest = useUpdateRequest(tab?.requestId!);
+  
   const requestColorMap: Record<string, string> = {
     GET: "text-green-500",
     POST: "text-blue-500",
@@ -33,11 +35,23 @@ const RequestBar = ({ tab, updateTab }: Props) => {
 
   const onSendRequest = async () => {
     try {
+      // Save URL, method, headers, parameters, and body to database before sending
+      if (tab.requestId) {
+        await updateRequest.mutateAsync({
+          url: tab.url,
+          method: tab.method as any,
+          headers: tab.headers,
+          parameters: tab.parameters,
+          body: tab.body,
+        });
+      }
+      
       const res = await mutateAsync();
       
       toast.success('Request sent successfully!');
     } catch (error) {
       toast.error('Failed to send request.');
+      console.error('Request error:', error);
     }
   }
 

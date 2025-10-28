@@ -1,13 +1,12 @@
 "use server";
 
 import db from "@/lib/db";
-import { REST_METHOD } from "@prisma/client";
 
 import axios, { AxiosRequestConfig } from "axios";
 
 export type Request= {
   name: string;
-  method: REST_METHOD;
+  method: any;
   url: string;
   body?: string;
   headers?: string;
@@ -47,6 +46,32 @@ const request =  await db.request.update({
       body: value.body,
       headers: value.headers,
       parameters: value.parameters,
+    },
+  });
+
+  return request;
+}
+
+// Quick update for URL and method changes
+export const updateRequestQuick = async (
+  id: string,
+  data: {
+    method?: any;
+    url?: string;
+    headers?: any;
+    parameters?: any;
+    body?: any;
+  }
+) => {
+  const request = await db.request.update({
+    where: { id },
+    data: {
+      ...(data.method && { method: data.method }),
+      ...(data.url && { url: data.url }),
+      ...(data.headers && { headers: data.headers }),
+      ...(data.parameters && { parameters: data.parameters }),
+      ...(data.body && { body: data.body }),
+      updatedAt: new Date()
     },
   });
 
@@ -120,14 +145,60 @@ export async function run(requestId: string) {
       throw new Error(`Request with id ${requestId} not found`);
     }
 
+    // Parse body properly - it's stored as Json type in Prisma
+    let parsedBody = undefined;
+    if (request.body) {
+      try {
+        // If body is a string, parse it as JSON
+        if (typeof request.body === 'string') {
+          parsedBody = JSON.parse(request.body);
+        } else {
+          // Already an object
+          parsedBody = request.body;
+        }
+      } catch (e) {
+        // If parsing fails, send as string
+        parsedBody = request.body;
+      }
+    }
+
+    // Parse headers properly
+    let parsedHeaders = undefined;
+    if (request.headers) {
+      try {
+        if (typeof request.headers === 'string') {
+          parsedHeaders = JSON.parse(request.headers);
+        } else {
+          parsedHeaders = request.headers as Record<string, string>;
+        }
+      } catch (e) {
+        parsedHeaders = undefined;
+      }
+    }
+
+    // Parse parameters properly
+    let parsedParams = undefined;
+    if (request.parameters) {
+      try {
+        if (typeof request.parameters === 'string') {
+          parsedParams = JSON.parse(request.parameters);
+        } else {
+          parsedParams = request.parameters as Record<string, any>;
+        }
+      } catch (e) {
+        parsedParams = undefined;
+      }
+    }
    
     const requestConfig = {
       method: request.method,
       url: request.url,
-      headers: request.headers as Record<string, string> || undefined,
-      params: request.parameters as Record<string, any> || undefined,
-      body: request.body || undefined
+      headers: parsedHeaders,
+      params: parsedParams,
+      body: parsedBody
     };
+
+    console.log('Request config being sent:', JSON.stringify(requestConfig, null, 2));
 
     const result = await sendRequest(requestConfig);
 

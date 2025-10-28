@@ -1,6 +1,9 @@
 
 # Postman Clone
 
+<p align="center">
+  <img src="./public/post-man-clone.png" alt="Postman Clone" width="600"/>
+</p>
 
 A modern, open-source **Postman alternative** built with **Next.js 15, TypeScript, Prisma, TailwindCSS, shadcn/ui, TanStack Query, and Zustand**.  
 It provides a sleek UI and developer-focused workflow to test and manage REST APIs and WebSocket connections efficiently.
@@ -134,4 +137,3 @@ Feel free to fork, contribute, and build your own features on top of it!
 
 
 
-# OpenPulse-An-Open-Source-Team-API-Command-and-Monitoring-Platform

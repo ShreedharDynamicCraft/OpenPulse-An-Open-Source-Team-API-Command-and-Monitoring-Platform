@@ -5,6 +5,7 @@ import {
   Request,
   run,
   saveRequest,
+  updateRequestQuick,
 } from "../actions";
 import { useRequestPlaygroundStore } from "../store/useRequestStore";
 
@@ -44,6 +45,22 @@ export function useSaveRequest(id: string) {
   });
 }
 
+export function useUpdateRequest(requestId: string) {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: {
+      method?: any;
+      url?: string;
+      headers?: any;
+      parameters?: any;
+      body?: any;
+    }) => updateRequestQuick(requestId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["requests"] });
+    },
+  });
+}
 
 export function useRunRequest(requestId: string) {
 
@@ -51,7 +68,7 @@ export function useRunRequest(requestId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => await run(requestId),
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["requests"] });
       setResponseViewerData(data);
     },

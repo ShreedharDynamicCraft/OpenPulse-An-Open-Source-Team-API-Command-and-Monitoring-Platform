@@ -46,11 +46,27 @@ export interface ResponseData {
 }
 
 interface Props {
-  responseData: ResponseData;
+  responseData: ResponseData | null;
 }
 
 const ResponseViewer = ({ responseData }: Props) => {
   const [activeTab, setActiveTab] = useState("json");
+
+  // Early return if no response data
+  if (!responseData || !responseData.requestRun) {
+    return (
+      <div className="w-full bg-zinc-950 text-white p-6">
+        <Card className="bg-zinc-900 border-zinc-800">
+          <CardContent className="p-6">
+            <div className="text-center text-gray-400">
+              <div className="text-lg mb-2">No response yet</div>
+              <div className="text-sm">Send a request to see the response here</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const getStatusColor = (status?: number): string => {
     const s = typeof status === "number" ? status : 0;
@@ -196,14 +212,14 @@ const ResponseViewer = ({ responseData }: Props) => {
                     value="headers"
                     className="bg-transparent data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-gray-400 rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 py-2"
                   >
-                    <Settings className="w-4 h-4 mr-2" />
+                    <FileText className="w-4 h-4 mr-2" />
                     Headers
                     <Badge
                       variant="secondary"
                       className="ml-2 text-xs bg-zinc-700"
                     >
                       {
-                        Object.keys(responseData.requestRun.headers ?? {})
+                        Object.keys(responseData?.requestRun?.headers ?? {})
                           .length
                       }
                     </Badge>
@@ -311,7 +327,7 @@ const ResponseViewer = ({ responseData }: Props) => {
                   <div className="p-6">
                     <div className="space-y-3">
                       {Object.entries(
-                        responseData.requestRun.headers ?? {}
+                        responseData?.requestRun?.headers ?? {}
                       ).map(([key, value]) => (
                         <div
                           key={key}
