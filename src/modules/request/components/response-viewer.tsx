@@ -122,41 +122,44 @@ const ResponseViewer = ({ responseData }: Props) => {
   const rawBody = responseData.requestRun?.body;
 
   return (
-    <div className="w-full bg-zinc-950 text-white p-6">
+    <div className="w-full bg-white dark:bg-gradient-to-br dark:from-zinc-950 dark:to-zinc-900 text-zinc-900 dark:text-white p-6 rounded-lg">
       <div className="w-full mx-auto">
         {/* Status Header */}
-        <Card className="bg-zinc-900 border-zinc-800 mb-6">
+        <Card className="bg-white dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 mb-6 shadow-xl backdrop-blur-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400">Status:</span>
+              <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-purple-50 dark:bg-zinc-800/50 px-3 py-2 rounded-lg border border-indigo-100 dark:border-transparent">
+                  <span className="text-indigo-700 dark:text-gray-400 text-sm font-medium">Status:</span>
                   <Badge
                     className={`${getStatusColor(
                       status
-                    )} bg-transparent border-current`}
+                    )} bg-transparent border-current font-bold`}
                   >
                     {status ?? "—"} • {statusText ?? ""}
                   </Badge>
+                  {status && status >= 200 && status < 300 && (
+                    <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-400">Time:</span>
-                  <span className="text-blue-300">
+                <div className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-cyan-50 dark:bg-zinc-800/50 px-3 py-2 rounded-lg border border-blue-100 dark:border-transparent">
+                  <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-blue-700 dark:text-gray-400 text-sm font-medium">Time:</span>
+                  <span className="text-blue-700 dark:text-blue-300 font-semibold">
                     {duration ? `${duration} ms` : "—"}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <HardDrive className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-400">Size:</span>
-                  <span className="text-green-300">{formatBytes(size)}</span>
+                <div className="flex items-center gap-2 bg-gradient-to-r from-purple-50 to-pink-50 dark:bg-zinc-800/50 px-3 py-2 rounded-lg border border-purple-100 dark:border-transparent">
+                  <HardDrive className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  <span className="text-purple-700 dark:text-gray-400 text-sm font-medium">Size:</span>
+                  <span className="text-purple-700 dark:text-purple-300 font-semibold">{formatBytes(size)}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="text-gray-400 hover:text-white"
+                  className="text-indigo-600 dark:text-gray-400 hover:text-indigo-700 dark:hover:text-white hover:bg-indigo-50 dark:hover:bg-zinc-800 transition-all duration-200"
                 >
                   <Filter className="w-4 h-4 mr-2" />
                   Filter
@@ -164,7 +167,7 @@ const ResponseViewer = ({ responseData }: Props) => {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="text-gray-400 hover:text-white"
+                  className="text-indigo-600 dark:text-gray-400 hover:text-indigo-700 dark:hover:text-white hover:bg-indigo-50 dark:hover:bg-zinc-800 transition-all duration-200"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Save

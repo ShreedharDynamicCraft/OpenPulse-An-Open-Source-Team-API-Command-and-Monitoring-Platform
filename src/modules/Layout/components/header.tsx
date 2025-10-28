@@ -3,7 +3,7 @@ import { Unplug, Search } from 'lucide-react'
 import React from 'react'
 import SearchBar from './search-bar'
 import UserButton from '@/modules/authentication/components/user-button'
-
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import InviteMember from './invite-member'
 import WorkSpace from './workspace'
 import { UserProps, WorkspaceProps } from '../types'
@@ -17,18 +17,26 @@ interface Props {
 const Header = ({ user, workspace }: Props) => {
 
   return (
-    <header className='grid grid-cols-5 grid-rows-1 gap-2 overflow-x-auto overflow-hidden p-2 border'>
-      <div className='col-span-2 flex items-center justify-between space-x-2 hover:cursor-pointer hover:opacity-80 ml-4'>
-        <Unplug size={28} className='text-indigo-400' />
+    <header className='grid grid-cols-5 grid-rows-1 gap-2 overflow-x-auto overflow-hidden p-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-gradient-to-r dark:from-zinc-950 dark:to-zinc-900 shadow-lg'>
+      <div className='col-span-2 flex items-center justify-between space-x-2 hover:cursor-pointer hover:opacity-80 ml-4 group'>
+        <div className="flex items-center gap-2">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg group-hover:shadow-indigo-500/50 transition-shadow duration-300">
+            <Unplug size={20} className='text-white' />
+          </div>
+          <span className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            API Tester
+          </span>
+        </div>
       </div>
 
       <div className='col-span-1 flex items-center justify-between space-x-2'>
-        <div className="border-animation relative p-[1px] rounded flex-1 self-stretch overflow-hidden flex items-center justify-center" aria-hidden="true">
+        <div className="border-animation relative p-[1px] rounded-lg flex-1 self-stretch overflow-hidden flex items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-200" aria-hidden="true">
           <SearchBar />
         </div>
       </div>
 
-      <div className='col-span-2 flex items-center justify-end space-x-2 hover:cursor-pointer hover:opacity-80'>
+      <div className='col-span-2 flex items-center justify-end space-x-3 hover:cursor-pointer hover:opacity-80'>
+        <ThemeToggle />
         <InviteMember />
         {/* @ts-ignore */}
         <WorkSpace workspace={workspace} />
