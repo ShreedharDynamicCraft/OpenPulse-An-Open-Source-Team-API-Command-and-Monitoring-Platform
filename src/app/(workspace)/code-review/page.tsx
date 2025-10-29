@@ -1,7 +1,7 @@
 "use client";
 
 import { useWorkspaceStore } from "@/modules/Layout/store";
-import { CodeReviewModule } from "@/modules/ai/components";
+import { CodeReviewModuleEnhanced } from "@/modules/ai/components";
 import { Loader2 } from "lucide-react";
 
 const CodeReviewPage = () => {
@@ -15,13 +15,7 @@ const CodeReviewPage = () => {
     );
   }
 
-  return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="flex-1 overflow-auto">
-        <CodeReviewModule workspaceId={selectedWorkspace.id} />
-      </div>
-    </div>
-  );
+  return <CodeReviewModuleEnhanced workspaceId={selectedWorkspace.id} />;
 };
 
 export default CodeReviewPage;

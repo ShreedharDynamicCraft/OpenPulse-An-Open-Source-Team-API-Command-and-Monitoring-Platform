@@ -433,3 +433,109 @@ model ActivityLog {
   @@index([userId, createdAt])
   @@index([type, workspaceId])
 }
+
+//
+// ─── 🆕 AI CODE REVIEW SYSTEM ────────────────────────────────────────────
+//
+
+enum ReviewType {
+  EMPATHETIC
+  GITHUB_REPO
+  GENERAL
+}
+
+enum ReviewSessionType {
+  PROJECT_BASED    // Review belongs to a project
+  STANDALONE       // Quick review without project
+}
+
+// Code Review Projects (like Collections for API testing)
+model CodeReviewProject {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  description String?
+  createdBy   String
+  
+  // Hierarchical structure - sessions belong to projects
+  sessions    CodeReviewSession[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([workspaceId])
+  @@index([createdBy])
+}
+
+// Code Review Sessions (like Requests in Collections)
+// Each session represents one review with its history
+model CodeReviewSession {
+  id          String             @id @default(cuid())
+  workspaceId String
+  userId      String
+  
+  // Project association (optional for standalone reviews)
+  projectId   String?
+  project     CodeReviewProject? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  sessionType ReviewSessionType  @default(STANDALONE)
+  reviewType  ReviewType
+  
+  // Session metadata
+  name        String             // e.g., "Login Component Review", "API Refactoring"
+  description String?
+  
+  // Original code/files being reviewed
+  code        String?            @db.Text
+  language    String?
+  filesPaths  Json?              // Array of file paths for GitHub reviews
+  
+  // Review configuration
+  tone        String?            // "gentle", "balanced", "direct"
+  model       String             // AI model used
+  
+  // Comments/feedback being transformed
+  originalComments Json?         // Array of harsh comments
+  
+  // History of review iterations
+  logs        CodeReviewLog[]
+  
+  // Metadata
+  tags        Json?              // Array of tags for categorization
+  isFavorite  Boolean            @default(false)
+  
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([sessionType])
+}
+
+// Code Review Logs (history of each review iteration)
+// Like RequestRun for API requests
+model CodeReviewLog {
+  id        String            @id @default(cuid())
+  sessionId String
+  session   CodeReviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  // Review execution details
+  response    String   @db.Text  // AI-generated review
+  model       String             // Model used for this iteration
+  tone        String?            // Tone used
+  duration    Int?               // milliseconds
+  
+  // Snapshot of inputs at time of review
+  codeSnapshot     String? @db.Text
+  commentsSnapshot Json?   // Comments at time of review
+  
+  // Execution metadata
+  status      String   @default("success") // "success", "failed", "error"
+  error       String?  @db.Text
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([sessionId, createdAt])
+  @@index([status])
+}
