@@ -25,9 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning className="h-full">
         <body
-          className={`${poppins.className} antialiased`}
+          className={`${poppins.className} antialiased h-full overflow-hidden`}
         >
           <QueryProvider>
             <ThemeProvider 

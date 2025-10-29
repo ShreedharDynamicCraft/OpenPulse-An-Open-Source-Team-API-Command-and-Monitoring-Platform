@@ -133,59 +133,62 @@ export function WorkspaceChat({ workspaceId }: WorkspaceChatProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-zinc-950 text-zinc-100 overflow-hidden">
-      {/* Header */}
-      <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-zinc-800 bg-zinc-950">
-        <div>
-          <h2 className="text-lg font-semibold">Workspace Chat</h2>
-          <p className="text-sm text-zinc-400">Collaborate with your team</p>
+    <div className="flex flex-col h-full w-full bg-zinc-950 text-zinc-100 overflow-hidden">
+      {/* Header - Fixed at top */}
+      <div className="flex items-center justify-between p-3 border-b border-zinc-800 bg-zinc-950 shrink-0">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-base font-semibold truncate">Workspace Chat</h2>
+          <p className="text-xs text-zinc-400 truncate">Collaborate with your team</p>
         </div>
         <Button 
           variant="outline" 
           size="sm" 
           onClick={() => setShowAIPanel(!showAIPanel)}
-          className="flex-shrink-0"
+          className="shrink-0 ml-2"
         >
-          <Brain className="w-4 h-4 mr-2" />
-          AI Assistant
+          <Brain className="w-4 h-4 mr-1.5" />
+          <span className="hidden sm:inline">AI</span>
         </Button>
       </div>
 
-      {/* AI Panel */}
+      {/* AI Panel - Collapsible */}
       {showAIPanel && (
-        <div className="flex-shrink-0 border-b border-zinc-800 bg-zinc-900 max-h-[400px] overflow-y-auto">
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold">AI Assistant</h3>
+        <div className="shrink-0 border-b border-zinc-800 bg-zinc-900/50 max-h-[350px] overflow-y-auto">
+          <div className="p-3">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-2">
+                <Brain className="w-4 h-4 text-indigo-400" />
+                AI Assistant
+              </h3>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowAIPanel(false)}
-                className="h-6 w-6 p-0"
+                className="h-7 w-7 p-0 hover:bg-zinc-800"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </Button>
             </div>
 
             <Tabs defaultValue="code" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-3">
-                <TabsTrigger value="code" onClick={() => setAiGithubUrl("")}>
-                  <Code className="w-4 h-4 mr-2" />
-                  Code Review
+              <TabsList className="grid w-full grid-cols-2 mb-2 h-8">
+                <TabsTrigger value="code" onClick={() => setAiGithubUrl("")} className="text-xs">
+                  <Code className="w-3.5 h-3.5 mr-1.5" />
+                  Code
                 </TabsTrigger>
-                <TabsTrigger value="github" onClick={() => setAiCode("")}>
-                  <Github className="w-4 h-4 mr-2" />
-                  GitHub Repo
+                <TabsTrigger value="github" onClick={() => setAiCode("")} className="text-xs">
+                  <Github className="w-3.5 h-3.5 mr-1.5" />
+                  GitHub
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="code" className="space-y-3 mt-0">
+              <TabsContent value="code" className="space-y-2 mt-0">
                 <div>
-                  <label className="text-xs text-zinc-400 block mb-1">Review Type</label>
+                  <label className="text-[11px] text-zinc-400 block mb-1 font-medium">Review Type</label>
                   <select
                     value={aiType}
                     onChange={(e) => setAiType(e.target.value as AIReviewType)}
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                   >
                     <option value="review">Code Review</option>
                     <option value="explain">Explain Code</option>
@@ -195,74 +198,74 @@ export function WorkspaceChat({ workspaceId }: WorkspaceChatProps) {
                 </div>
 
                 <div>
-                  <label className="text-xs text-zinc-400 block mb-1">Language</label>
+                  <label className="text-[11px] text-zinc-400 block mb-1 font-medium">Language</label>
                   <Input
                     value={aiLanguage}
                     onChange={(e) => setAiLanguage(e.target.value)}
-                    placeholder="typescript"
-                    className="bg-zinc-800 border-zinc-700 text-sm h-9"
+                    placeholder="typescript, python, java..."
+                    className="bg-zinc-800 border-zinc-700 text-xs h-8"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs text-zinc-400 block mb-1">Code</label>
+                  <label className="text-[11px] text-zinc-400 block mb-1 font-medium">Code</label>
                   <Textarea
                     value={aiCode}
                     onChange={(e) => setAiCode(e.target.value)}
                     placeholder="Paste your code here..."
-                    rows={6}
-                    className="bg-zinc-800 border-zinc-700 font-mono text-xs resize-none"
+                    rows={5}
+                    className="bg-zinc-800 border-zinc-700 font-mono text-[11px] resize-none leading-relaxed"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs text-zinc-400 block mb-1">Context (optional)</label>
+                  <label className="text-[11px] text-zinc-400 block mb-1 font-medium">Context (optional)</label>
                   <Input
                     value={aiContext}
                     onChange={(e) => setAiContext(e.target.value)}
                     placeholder="Additional context for AI..."
-                    className="bg-zinc-800 border-zinc-700 text-sm h-9"
+                    className="bg-zinc-800 border-zinc-700 text-xs h-8"
                   />
                 </div>
 
                 <Button
                   onClick={handleAIReview}
                   disabled={!aiCode || aiReviewMutation.isPending}
-                  className="w-full"
+                  className="w-full h-8"
                   size="sm"
                 >
                   {aiReviewMutation.isPending ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Analyzing...
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                      <span className="text-xs">Analyzing...</span>
                     </>
                   ) : (
                     <>
-                      <Brain className="w-4 h-4 mr-2" />
-                      Get AI Review
+                      <Brain className="w-3.5 h-3.5 mr-1.5" />
+                      <span className="text-xs">Get AI Review</span>
                     </>
                   )}
                 </Button>
               </TabsContent>
 
-              <TabsContent value="github" className="space-y-3 mt-0">
+              <TabsContent value="github" className="space-y-2 mt-0">
                 <div>
-                  <label className="text-xs text-zinc-400 block mb-1">GitHub Repository URL</label>
+                  <label className="text-[11px] text-zinc-400 block mb-1 font-medium">GitHub Repository URL</label>
                   <Input
                     value={aiGithubUrl}
                     onChange={(e) => setAiGithubUrl(e.target.value)}
                     placeholder="https://github.com/owner/repo"
-                    className="bg-zinc-800 border-zinc-700 text-sm h-9"
+                    className="bg-zinc-800 border-zinc-700 text-xs h-8"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs text-zinc-400 block mb-1">Context (optional)</label>
+                  <label className="text-[11px] text-zinc-400 block mb-1 font-medium">Context (optional)</label>
                   <Textarea
                     value={aiContext}
                     onChange={(e) => setAiContext(e.target.value)}
                     placeholder="What aspects should AI focus on?"
-                    rows={4}
+                    rows={3}
                     className="bg-zinc-800 border-zinc-700 text-xs resize-none"
                   />
                 </div>
@@ -270,18 +273,18 @@ export function WorkspaceChat({ workspaceId }: WorkspaceChatProps) {
                 <Button
                   onClick={handleAIReview}
                   disabled={!aiGithubUrl || aiReviewMutation.isPending}
-                  className="w-full"
+                  className="w-full h-8"
                   size="sm"
                 >
                   {aiReviewMutation.isPending ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Analyzing Repository...
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                      <span className="text-xs">Analyzing...</span>
                     </>
                   ) : (
                     <>
-                      <Github className="w-4 h-4 mr-2" />
-                      Review Repository
+                      <Github className="w-3.5 h-3.5 mr-1.5" />
+                      <span className="text-xs">Review Repository</span>
                     </>
                   )}
                 </Button>
@@ -291,38 +294,38 @@ export function WorkspaceChat({ workspaceId }: WorkspaceChatProps) {
         </div>
       )}
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-hidden">
+      {/* Messages Area - Flexible, fills remaining space */}
+      <div className="flex-1 min-h-0 overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
           </div>
         ) : chatError ? (
-          <div className="flex flex-col items-center justify-center h-full text-zinc-500">
-            <MessageSquare className="w-16 h-16 mb-4 opacity-50" />
-            <p className="text-lg font-semibold">Error loading messages</p>
-            <p className="text-sm">Please try again later</p>
+          <div className="flex flex-col items-center justify-center h-full text-zinc-500 p-4">
+            <MessageSquare className="w-12 h-12 mb-3 opacity-50" />
+            <p className="text-base font-semibold">Error loading messages</p>
+            <p className="text-xs text-center">Please try again later</p>
           </div>
         ) : messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-zinc-500">
-            <MessageSquare className="w-16 h-16 mb-4 opacity-50" />
-            <p className="text-lg font-semibold">No messages yet</p>
-            <p className="text-sm">Start a conversation with your team!</p>
+          <div className="flex flex-col items-center justify-center h-full text-zinc-500 p-4">
+            <MessageSquare className="w-12 h-12 mb-3 opacity-50" />
+            <p className="text-base font-semibold">No messages yet</p>
+            <p className="text-xs text-center">Start a conversation with your team!</p>
           </div>
         ) : (
-          <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
-            <div className="space-y-4 pb-4">
+          <ScrollArea className="h-full">
+            <div className="p-3 space-y-3 pb-2">
               {hasNextPage && (
                 <Button
                   variant="ghost"
                   onClick={() => fetchNextPage()}
                   disabled={isFetchingNextPage}
-                  className="w-full text-sm"
+                  className="w-full text-xs h-7"
                   size="sm"
                 >
                   {isFetchingNextPage ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
                       Loading...
                     </>
                   ) : (
@@ -345,8 +348,8 @@ export function WorkspaceChat({ workspaceId }: WorkspaceChatProps) {
         )}
       </div>
 
-      {/* Input Area */}
-      <div className="flex-shrink-0 p-4 border-t border-zinc-800 bg-zinc-950">
+      {/* Input Area - Fixed at bottom */}
+      <div className="shrink-0 p-3 border-t border-zinc-800 bg-zinc-950">
         <div className="flex items-end gap-2">
           <Textarea
             value={message}
@@ -354,25 +357,30 @@ export function WorkspaceChat({ workspaceId }: WorkspaceChatProps) {
             onKeyDown={handleKeyDown}
             placeholder="Type a message... (Shift+Enter for new line)"
             rows={2}
-            className="flex-1 bg-zinc-900 border-zinc-700 resize-none text-sm"
+            className="flex-1 bg-zinc-900 border-zinc-700 resize-none text-sm min-h-[60px] max-h-[120px]"
             disabled={sendMessageMutation.isPending}
           />
           <Button
             onClick={handleSendMessage}
             disabled={!message.trim() || sendMessageMutation.isPending}
             size="icon"
-            className="h-[72px] w-12 flex-shrink-0"
+            className="h-[60px] w-11 shrink-0"
           >
             {sendMessageMutation.isPending ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4" />
             )}
           </Button>
         </div>
-        <p className="text-xs text-zinc-500 mt-2">
-          Press <kbd className="px-1 py-0.5 bg-zinc-800 rounded text-[10px]">Enter</kbd> to send,{" "}
-          <kbd className="px-1 py-0.5 bg-zinc-800 rounded text-[10px]">Shift+Enter</kbd> for new line
+        <p className="text-[10px] text-zinc-500 mt-1.5 flex items-center gap-2">
+          <span className="flex items-center gap-1">
+            <kbd className="px-1 py-0.5 bg-zinc-800 rounded text-[9px]">Enter</kbd> to send
+          </span>
+          <span className="text-zinc-700">•</span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1 py-0.5 bg-zinc-800 rounded text-[9px]">Shift+Enter</kbd> for new line
+          </span>
         </p>
       </div>
     </div>
@@ -405,42 +413,42 @@ function MessageBubble({ message, currentUserId, onReaction }: MessageBubbleProp
 
   return (
     <Card 
-      className={`p-3 ${
+      className={`p-2.5 ${
         isAI 
-          ? "bg-indigo-950/30 border-indigo-900" 
+          ? "bg-indigo-950/30 border-indigo-900/50" 
           : isSystem 
           ? "bg-amber-950/20 border-amber-900/30"
-          : "bg-zinc-900 border-zinc-800"
+          : "bg-zinc-900/80 border-zinc-800"
       }`}
     >
-      <div className="flex items-start gap-3">
-        <Avatar className="w-8 h-8 flex-shrink-0">
+      <div className="flex items-start gap-2.5">
+        <Avatar className="w-7 h-7 shrink-0">
           <AvatarImage src={message.userImage || undefined} />
           <AvatarFallback className={
-            isAI ? "bg-indigo-600 text-white" : 
-            isSystem ? "bg-amber-600 text-white" : 
-            "bg-zinc-700 text-zinc-300"
+            isAI ? "bg-indigo-600 text-white text-xs" : 
+            isSystem ? "bg-amber-600 text-white text-xs" : 
+            "bg-zinc-700 text-zinc-300 text-xs"
           }>
             {isAI ? "🤖" : isSystem ? "⚙️" : (message.userName?.[0]?.toUpperCase() || "?")}
           </AvatarFallback>
         </Avatar>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="font-semibold text-sm">
+          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+            <span className="font-semibold text-xs">
               {isAI ? "AI Assistant" : isSystem ? "System" : message.userName || "Unknown User"}
             </span>
             {isAI && (
-              <span className="text-[10px] bg-indigo-600 px-2 py-0.5 rounded-full font-medium">
+              <span className="text-[9px] bg-indigo-600 px-1.5 py-0.5 rounded-full font-medium">
                 Gemini
               </span>
             )}
             {isSystem && (
-              <span className="text-[10px] bg-amber-600 px-2 py-0.5 rounded-full font-medium">
+              <span className="text-[9px] bg-amber-600 px-1.5 py-0.5 rounded-full font-medium">
                 Auto
               </span>
             )}
-            <span className="text-xs text-zinc-500">
+            <span className="text-[10px] text-zinc-500">
               {new Date(message.createdAt).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -450,15 +458,16 @@ function MessageBubble({ message, currentUserId, onReaction }: MessageBubbleProp
 
           {/* Message Content */}
           {message.type === "CODE" && message.codeLanguage ? (
-            <div className="mt-2">
+            <div className="mt-1.5">
               <SyntaxHighlighter 
                 language={message.codeLanguage || "typescript"} 
                 style={vscDarkPlus}
                 customStyle={{
                   margin: 0,
-                  borderRadius: "0.5rem",
-                  fontSize: "0.75rem",
-                  background: "#1a1a1a",
+                  borderRadius: "0.375rem",
+                  fontSize: "0.6875rem",
+                  background: "#0a0a0a",
+                  padding: "0.75rem",
                 }}
                 showLineNumbers
               >
@@ -466,7 +475,7 @@ function MessageBubble({ message, currentUserId, onReaction }: MessageBubbleProp
               </SyntaxHighlighter>
             </div>
           ) : (isAI || message.type === "AI_RESPONSE") ? (
-            <div className="prose prose-invert prose-sm max-w-none mt-2">
+            <div className="prose prose-invert prose-sm max-w-none mt-1.5">
               <ReactMarkdown
                 components={{
                   code({ node, inline, className, children, ...props }) {
@@ -477,10 +486,11 @@ function MessageBubble({ message, currentUserId, onReaction }: MessageBubbleProp
                         style={vscDarkPlus} 
                         PreTag="div"
                         customStyle={{
-                          margin: "0.5rem 0",
-                          borderRadius: "0.5rem",
-                          fontSize: "0.75rem",
-                          background: "#1a1a1a",
+                          margin: "0.375rem 0",
+                          borderRadius: "0.375rem",
+                          fontSize: "0.6875rem",
+                          background: "#0a0a0a",
+                          padding: "0.75rem",
                         }}
                         showLineNumbers
                         {...props}
@@ -488,19 +498,19 @@ function MessageBubble({ message, currentUserId, onReaction }: MessageBubbleProp
                         {String(children).replace(/\n$/, "")}
                       </SyntaxHighlighter>
                     ) : (
-                      <code className="bg-zinc-800 px-1 py-0.5 rounded text-xs" {...props}>
+                      <code className="bg-zinc-800 px-1 py-0.5 rounded text-[11px]" {...props}>
                         {children}
                       </code>
                     );
                   },
-                  p: ({ children }) => <p className="mb-2 last:mb-0 text-sm leading-relaxed">{children}</p>,
-                  ul: ({ children }) => <ul className="list-disc list-inside mb-2 text-sm space-y-1">{children}</ul>,
-                  ol: ({ children }) => <ol className="list-decimal list-inside mb-2 text-sm space-y-1">{children}</ol>,
-                  h1: ({ children }) => <h1 className="text-lg font-bold mb-2 mt-3 first:mt-0">{children}</h1>,
-                  h2: ({ children }) => <h2 className="text-base font-bold mb-2 mt-2">{children}</h2>,
-                  h3: ({ children }) => <h3 className="text-sm font-bold mb-1 mt-2">{children}</h3>,
+                  p: ({ children }) => <p className="mb-1.5 last:mb-0 text-xs leading-relaxed">{children}</p>,
+                  ul: ({ children }) => <ul className="list-disc list-inside mb-1.5 text-xs space-y-0.5">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal list-inside mb-1.5 text-xs space-y-0.5">{children}</ol>,
+                  h1: ({ children }) => <h1 className="text-sm font-bold mb-1.5 mt-2 first:mt-0">{children}</h1>,
+                  h2: ({ children }) => <h2 className="text-xs font-bold mb-1.5 mt-1.5">{children}</h2>,
+                  h3: ({ children }) => <h3 className="text-xs font-bold mb-1 mt-1.5">{children}</h3>,
                   blockquote: ({ children }) => (
-                    <blockquote className="border-l-4 border-zinc-600 pl-4 my-2 text-zinc-400">
+                    <blockquote className="border-l-2 border-zinc-600 pl-3 my-1.5 text-zinc-400 text-xs">
                       {children}
                     </blockquote>
                   ),
@@ -510,39 +520,39 @@ function MessageBubble({ message, currentUserId, onReaction }: MessageBubbleProp
               </ReactMarkdown>
             </div>
           ) : (
-            <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+            <p className="text-xs text-zinc-300 whitespace-pre-wrap leading-relaxed">
               {message.content}
             </p>
           )}
 
           {/* Reactions */}
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
+          <div className="flex items-center gap-1.5 mt-2 flex-wrap">
             {Object.entries(groupedReactions).map(([emoji, count]) => (
               <button
                 key={emoji}
                 onClick={() => handleReactionClick(emoji)}
-                className="flex items-center gap-1 px-2 py-1 bg-zinc-800 hover:bg-zinc-700 rounded-full text-xs transition-colors"
+                className="flex items-center gap-1 px-1.5 py-0.5 bg-zinc-800 hover:bg-zinc-700 rounded-full text-[10px] transition-colors"
               >
-                <span>{emoji}</span>
+                <span className="text-xs">{emoji}</span>
                 <span className="text-zinc-400">{count as number}</span>
               </button>
             ))}
 
             <button
               onClick={() => setShowReactions(!showReactions)}
-              className="p-1 hover:bg-zinc-800 rounded-full transition-colors"
+              className="p-0.5 hover:bg-zinc-800 rounded-full transition-colors"
               title="Add reaction"
             >
-              <Smile className="w-4 h-4 text-zinc-400" />
+              <Smile className="w-3.5 h-3.5 text-zinc-400" />
             </button>
 
             {showReactions && (
-              <div className="flex gap-1 ml-2">
+              <div className="flex gap-0.5 ml-1">
                 {reactions.map((emoji) => (
                   <button
                     key={emoji}
                     onClick={() => handleReactionClick(emoji)}
-                    className="text-lg hover:scale-125 transition-transform p-1"
+                    className="text-sm hover:scale-110 transition-transform p-0.5"
                   >
                     {emoji}
                   </button>
@@ -553,7 +563,7 @@ function MessageBubble({ message, currentUserId, onReaction }: MessageBubbleProp
 
           {/* Reply count */}
           {message._count?.replies && message._count.replies > 0 && (
-            <button className="text-xs text-indigo-400 hover:underline mt-2 flex items-center gap-1">
+            <button className="text-[10px] text-indigo-400 hover:underline mt-1.5 flex items-center gap-1">
               <MessageSquare className="w-3 h-3" />
               {message._count.replies} {message._count.replies === 1 ? "reply" : "replies"}
             </button>

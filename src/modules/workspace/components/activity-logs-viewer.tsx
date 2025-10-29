@@ -75,9 +75,9 @@ export function ActivityLogsViewer({ workspaceId }: ActivityLogsViewerProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-zinc-950 text-zinc-100">
+    <div className="flex flex-col h-full w-full bg-zinc-950 text-zinc-100 overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-zinc-800">
+      <div className="p-4 border-b border-zinc-800 shrink-0">
         <h2 className="text-lg font-semibold mb-4">Activity Logs</h2>
 
         {/* Filters */}
@@ -124,7 +124,7 @@ export function ActivityLogsViewer({ workspaceId }: ActivityLogsViewerProps) {
       </div>
 
       {/* Logs List */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 min-h-0 p-4">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />

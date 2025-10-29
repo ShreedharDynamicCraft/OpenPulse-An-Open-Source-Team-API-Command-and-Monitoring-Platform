@@ -41,13 +41,13 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
         return renderCollections();
       case 'Chat':
         return (
-          <div className="h-full">
+          <div className="flex flex-col h-full w-full overflow-hidden">
             <WorkspaceChat workspaceId={currentWorkspace?.id} />
           </div>
         );
       case 'Logs':
         return (
-          <div className="h-full">
+          <div className="flex flex-col h-full w-full overflow-hidden">
             <ActivityLogsViewer workspaceId={currentWorkspace?.id} />
           </div>
         );
@@ -58,15 +58,15 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
 
   const renderCollections = () => {
     return (
-      <div className="h-full bg-zinc-950 text-zinc-100 flex flex-col">
+      <div className="flex flex-col h-full w-full bg-zinc-950 text-zinc-100 overflow-hidden">
      
         <div className="flex items-center justify-between p-4 border-b border-zinc-800 shrink-0">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-zinc-400">{currentWorkspace?.name}</span>
-            <span className="text-zinc-600">›</span>
-            <span className="text-sm font-medium">Collections</span>
+          <div className="flex items-center space-x-2 min-w-0">
+            <span className="text-sm text-zinc-400 truncate">{currentWorkspace?.name}</span>
+            <span className="text-zinc-600 shrink-0">›</span>
+            <span className="text-sm font-medium shrink-0">Collections</span>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 shrink-0">
             <HelpCircle className="w-4 h-4 text-zinc-400 hover:text-zinc-300 cursor-pointer" />
             <ExternalLink className="w-4 h-4 text-zinc-400 hover:text-zinc-300 cursor-pointer" />
           </div>
@@ -93,7 +93,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
           </Button>
         </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto">
         {collections && collections.length > 0 ? (
           collections.map((collection) => (
             <div className='flex flex-col justify-start items-start p-3 border-b border-zinc-800 w-full' key={collection.id}>
@@ -109,9 +109,9 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
   };
 
   return (
-    <div className="flex h-screen bg-zinc-900">
+    <div className="flex h-full w-full bg-zinc-900">
       {/* Tab Sidebar */}
-      <div className="w-14 bg-zinc-950 border-r border-zinc-800 flex flex-col items-center py-4 space-y-4">
+      <div className="w-14 bg-zinc-950 border-r border-zinc-800 flex flex-col items-center py-4 space-y-4 shrink-0">
         {sidebarItems.map((item, index) => (
           <button
             key={index}
@@ -129,7 +129,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 bg-zinc-900 flex flex-col overflow-hidden">{renderTabContent()}</div>
+      <div className="flex-1 min-w-0 bg-zinc-900 overflow-hidden">{renderTabContent()}</div>
 
       <CreateCollection
         workspaceId={currentWorkspace?.id}
