@@ -1,4 +1,4 @@
-name : postman-clone
+name : api-command-hub
 services:
   db:
     image: postgres:latest

@@ -6,6 +6,9 @@ import {
   Edit,
   ChevronDown,
   ChevronRight,
+  PlayIcon,
+  Sparkles,
+  Zap,
 } from "lucide-react";
 import React, { useState } from "react";
 import {
@@ -23,6 +26,9 @@ import {
 import EditCollectionModal from "./edit-collection";
 import DeleteCollectionModal from "./delete-collection";
 import AddRequestCollectionModal from "./add-request-modal";
+import { BatchRunnerDialog } from "./batch-runner-dialog";
+import { TestGeneratorDialog } from "@/modules/ai/components/test-generator-dialog";
+import { LoadTestDialog } from "./load-test-dialog";
 import { useGetAllRequestFromCollection } from "@/modules/request/hooks/request";
 import { REST_METHOD } from "@prisma/client";
 import { useRequestPlaygroundStore } from "@/modules/request/store/useRequestStore";
@@ -99,6 +105,36 @@ const CollectionFolder = ({ collection }: Props) => {
             </CollapsibleTrigger>
 
             <div className="flex flex-row justify-center items-center space-x-2">
+              {hasRequests && (
+                <>
+                  <TestGeneratorDialog
+                    workspaceId={collection.workspaceId}
+                    collectionId={collection.id}
+                    collectionName={collection.name}
+                    trigger={
+                      <button
+                        className="p-1 hover:bg-zinc-800 rounded"
+                        title="AI Generate Tests"
+                      >
+                        <Sparkles className="w-4 h-4 text-purple-400 hover:text-purple-300" />
+                      </button>
+                    }
+                  />
+                  <BatchRunnerDialog
+                    workspaceId={collection.workspaceId}
+                    collectionId={collection.id}
+                    collectionName={collection.name}
+                    trigger={
+                      <button
+                        className="p-1 hover:bg-zinc-800 rounded"
+                        title="Run all tests"
+                      >
+                        <PlayIcon className="w-4 h-4 text-green-400 hover:text-green-300" />
+                      </button>
+                    }
+                  />
+                </>
+              )}
               <FilePlus
                 className="w-4 h-4 text-zinc-400 hover:text-indigo-400 cursor-pointer"
                 onClick={() => setIsAddRequestOpen(true)}
@@ -198,7 +234,24 @@ const CollectionFolder = ({ collection }: Props) => {
                       </div>
                     </div>
 
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <LoadTestDialog
+                        workspaceId={collection.workspaceId}
+                        requestId={request.id}
+                        requestName={request.name || request.url}
+                        trigger={
+                          <button
+                            className="p-1 hover:bg-zinc-800 rounded"
+                            title="Load test this request"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            <Zap className="w-3 h-3 text-yellow-400" />
+                          </button>
+                        }
+                      />
+                      
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button className="p-1 hover:bg-zinc-800 rounded">

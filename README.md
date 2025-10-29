@@ -1,6 +1,8 @@
 
-A modern, open-source **Postman alternative** built with **Next.js 15, TypeScript, Prisma, TailwindCSS, shadcn/ui, TanStack Query, and Zustand**.  
-It provides a sleek UI and developer-focused workflow to test and manage REST APIs and WebSocket connections efficiently.
+# 🚀 API Command Hub
+
+A modern, open-source **Professional API Testing and Monitoring Platform** built with **Next.js 15, TypeScript, Prisma, TailwindCSS, shadcn/ui, TanStack Query, and Zustand**.  
+It provides a sleek UI and developer-focused workflow to test, monitor, and manage REST APIs and WebSocket connections efficiently.
 
 **🆕 Now with AI-powered collaborative chat and comprehensive activity logging!**
 
@@ -78,7 +80,7 @@ It provides a sleek UI and developer-focused workflow to test and manage REST AP
 - **Icons:** Lucide-react  
 - **Editor:** Monaco Editor  
 - **Auth:** Clerk  
-- **AI:** Google Gemini API (gemini-1.5-pro)  
+- **AI:** Google Gemini API (gemini-2.0-flash)  
 - **Markdown:** react-markdown + react-syntax-highlighter  
 - **Deployment:** Vercel  
 
@@ -86,10 +88,11 @@ It provides a sleek UI and developer-focused workflow to test and manage REST AP
 
 ## 🚀 Getting Started
 
-### 1. Clone the Repository
+### Clone the repository
+
 ```bash
-git clone https://github.com/Aestheticsuraj234/postman-clone
-cd postman-clone
+git clone https://github.com/Aestheticsuraj234/api-command-hub
+cd api-command-hub
 ````
 
 ### 2. Install Dependencies
@@ -104,7 +107,7 @@ npm install
 Create a `.env` file in the root and add:
 
 ```env
-DATABASE_URL="postgresql://user:password@localhost:5432/postmanclone"
+DATABASE_URL="postgresql://user:password@localhost:5432/apicommandhub"
 
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key

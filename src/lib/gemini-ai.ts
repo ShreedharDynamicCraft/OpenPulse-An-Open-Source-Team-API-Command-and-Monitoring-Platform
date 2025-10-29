@@ -21,80 +21,47 @@ export interface GitHubReviewRequest {
  * Perform AI code review on a code snippet
  */
 export async function reviewCode(request: CodeReviewRequest) {
+  if (!request.code || request.code.trim() === "") {
+    return {
+      success: false,
+      error: "Code cannot be empty",
+      content: null,
+    };
+  }
+
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    let prompt = "";
-
+    let promptType = "";
     switch (request.type) {
       case "review":
-        prompt = `You are an expert code reviewer. Review this ${request.language || "code"} snippet and provide:
-1. **Potential Issues**: bugs, errors, or problems
-2. **Security Concerns**: vulnerabilities or unsafe practices
-3. **Performance**: optimization opportunities
-4. **Best Practices**: code quality improvements
-5. **Suggestions**: specific, actionable recommendations
-
-${request.context ? `Context: ${request.context}\n\n` : ""}
-Code to review:
-\`\`\`${request.language || ""}
-${request.code}
-\`\`\`
-
-Provide your review in well-formatted markdown with clear sections and code examples where helpful.`;
+        promptType = "Perform a thorough code review. Analyze code quality, best practices, potential bugs, security issues, and suggest improvements.";
         break;
-
       case "explain":
-        prompt = `You are an expert software engineer. Explain this ${request.language || "code"} in detail:
-
-\`\`\`${request.language || ""}
-${request.code}
-\`\`\`
-
-${request.context ? `Context: ${request.context}\n\n` : ""}
-Provide:
-1. **Overview**: what this code does
-2. **Line-by-line explanation**: key logic and patterns
-3. **Use cases**: when to use this approach
-4. **Related concepts**: relevant patterns or techniques
-
-Format your response in markdown with clear sections.`;
+        promptType = "Explain this code in detail. Describe what it does, how it works, and break down complex parts.";
         break;
-
       case "optimize":
-        prompt = `You are a performance optimization expert. Analyze this ${request.language || "code"} and suggest optimizations:
-
-\`\`\`${request.language || ""}
-${request.code}
-\`\`\`
-
-${request.context ? `Context: ${request.context}\n\n` : ""}
-Provide:
-1. **Performance Analysis**: current bottlenecks
-2. **Optimizations**: specific improvements with code examples
-3. **Trade-offs**: explain any compromises
-4. **Benchmarks**: estimated impact if known
-
-Format with markdown and include optimized code examples.`;
+        promptType = "Analyze this code for optimization opportunities. Suggest performance improvements, better algorithms, and cleaner patterns.";
         break;
-
       case "test":
-        prompt = `You are a testing expert. Generate comprehensive tests for this ${request.language || "code"}:
-
-\`\`\`${request.language || ""}
-${request.code}
-\`\`\`
-
-${request.context ? `Context: ${request.context}\n\n` : ""}
-Provide:
-1. **Unit Tests**: test cases with examples
-2. **Edge Cases**: scenarios to test
-3. **Test Strategy**: testing approach
-4. **Code Coverage**: what to test and why
-
-Format in markdown with test code examples using popular testing frameworks.`;
+        promptType = "Generate comprehensive test cases for this code. Include unit tests, edge cases, and error scenarios.";
         break;
     }
+
+    const prompt = `
+You are an expert code reviewer and software architect.
+
+${promptType}
+
+**Language**: ${request.language || "Not specified"}
+${request.context ? `**Context**: ${request.context}\n` : ""}
+
+**Code**:
+\`\`\`${request.language || ""}
+${request.code}
+\`\`\`
+
+Provide a detailed analysis in well-structured markdown format.`;
 
     const result = await model.generateContent(prompt);
     const response = result.response;
@@ -103,13 +70,13 @@ Format in markdown with test code examples using popular testing frameworks.`;
     return {
       success: true,
       content: text,
-      model: "gemini-1.5-pro",
+      model: "gemini-2.0-flash",
     };
   } catch (error: any) {
-    console.error("Gemini API error:", error);
+    console.error("Code review error:", error);
     return {
       success: false,
-      error: error.message || "Failed to generate AI response",
+      error: error.message || "Failed to review code",
       content: null,
     };
   }
@@ -140,7 +107,7 @@ export async function reviewGitHubRepo(request: GitHubReviewRequest) {
       {
         headers: {
           Accept: "application/vnd.github.v3+json",
-          "User-Agent": "Postman-Clone-App",
+          "User-Agent": "API-Command-Hub",
         },
       }
     );
@@ -160,7 +127,7 @@ export async function reviewGitHubRepo(request: GitHubReviewRequest) {
       {
         headers: {
           Accept: "application/vnd.github.v3+json",
-          "User-Agent": "Postman-Clone-App",
+          "User-Agent": "API-Command-Hub",
         },
       }
     );
@@ -173,7 +140,7 @@ export async function reviewGitHubRepo(request: GitHubReviewRequest) {
       {
         headers: {
           Accept: "application/vnd.github.v3+json",
-          "User-Agent": "Postman-Clone-App",
+          "User-Agent": "API-Command-Hub",
         },
       }
     );
@@ -194,7 +161,7 @@ export async function reviewGitHubRepo(request: GitHubReviewRequest) {
           .join("\n")
       : "No recent commits";
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const prompt = `You are an expert software architect and code reviewer. Analyze this GitHub repository:
 
@@ -231,7 +198,7 @@ Format your analysis in well-structured markdown.`;
     return {
       success: true,
       content: text,
-      model: "gemini-1.5-pro",
+      model: "gemini-2.0-flash",
       repositoryInfo: {
         name: repoData.full_name,
         description: repoData.description,
@@ -258,9 +225,9 @@ export async function generateChatResponse(
   context?: string
 ) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    const prompt = `You are a helpful AI assistant for a Postman-like API testing tool. 
+    const prompt = `You are a helpful AI assistant for an API Testing and Monitoring Platform. 
     
 User question: ${message}
 
@@ -275,7 +242,7 @@ Provide a helpful, concise, and accurate response. Format your response in markd
     return {
       success: true,
       content: text,
-      model: "gemini-1.5-pro",
+      model: "gemini-2.0-flash",
     };
   } catch (error: any) {
     console.error("Chat AI error:", error);

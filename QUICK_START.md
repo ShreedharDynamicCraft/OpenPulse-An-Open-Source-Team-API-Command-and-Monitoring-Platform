@@ -1,246 +1,141 @@
-# 🚀 Quick Start Guide - Workspace Collaboration Features
+# 🎯 Quick Start Guide - New Features
 
-## ✅ What's New
+## 🚀 Batch Testing
 
-Your Postman Clone now has a **complete collaboration system**!
+### How to Run Batch Tests:
+1. Open any workspace
+2. Navigate to a collection with requests
+3. Click the **green play button** (▶️) next to the collection name
+4. Configure options in the dialog:
+   - **Run in Parallel**: Run all requests simultaneously
+   - **Stop on Error**: Stop execution if a request fails
+   - **Delay Between Requests**: Add milliseconds between requests
+5. Click "Start Batch"
+6. View real-time results
 
-### Features Added:
-1. ✨ **Role Upgrade Requests** - Viewers can request Editor access
-2. 💬 **Real-time Workspace Chat** - Team communication
-3. 📊 **Activity Feed** - Track all workspace events
-4. 👥 **Team Panel** - See all members and their roles
-5. 🔔 **Notification Bell** - Admins get notified of requests
-6. 🔒 **Permission Controls** - Viewers can't send invite links
+### Export Reports:
+- **PDF**: Click "Export PDF" for a professional report with charts
+- **JSON**: Click "Export JSON" for raw data export
 
----
+## 📊 Analytics Dashboard
 
-## 🎯 Try It Out!
+### Accessing Analytics:
+1. Click the **Analytics** tab (📊 icon) in the sidebar
+2. View comprehensive metrics:
+   - Total requests & success rate
+   - Average response times
+   - Requests in last 24 hours
+   - HTTP method breakdown
+   - Response time trends
+   - Top 5 collections
 
-### For Viewers:
-1. Open your workspace
-2. Look for the **"Request Editor Access"** button in the header
-3. Click it and optionally add a message
-4. Submit your request
-5. Wait for admin approval
-6. Note: You **cannot** invite new members (permission restriction)
+### Dashboard Features:
+- **Auto-refresh**: Updates every 30 seconds
+- **Interactive charts**: Pie chart, bar chart, line chart
+- **Collection leaderboard**: See most active collections
 
-### For Admins:
-1. Look for the **Notification Bell** 🔔 in the header
-2. You'll see a red badge with the count of pending requests
-3. Click the bell to see notifications
-4. Click a notification to review the request
-5. **Approve** or **Reject** the request
-6. The Viewer's role will be upgraded automatically!
+## 🤖 AI Features (Already Available)
 
-### For Everyone - Workspace Chat:
-1. Click the **💬 Chat** icon in the left sidebar
-2. Type your message in the input box
-3. Press **Enter** or click **Send**
-4. Messages update in real-time (every 3 seconds)
-5. See who's online in the header
+### Chat with AI:
+1. Click **Chat** tab in sidebar
+2. Ask questions about your API tests
+3. Get code suggestions and improvements
 
-### For Everyone - Activity Feed:
-1. Click the **📊 Activity** icon in the sidebar
-2. See all recent workspace activities
-3. Color-coded by event type
-4. Auto-refreshes every 5 seconds
+### AI Code Review:
+1. In chat, paste a GitHub repository URL
+2. AI analyzes code and provides suggestions
+3. Get improvement recommendations
 
-### For Everyone - Team Panel:
-1. Click the **👥 Team** icon in the sidebar
-2. View all workspace members
-3. See their roles (Owner, Admin, Editor, Viewer)
-4. Green dot indicates online status
+## 📝 Activity Logs
 
----
+### Viewing Logs:
+1. Click **Logs** tab in sidebar
+2. Filter by:
+   - Log type (Test Run, Collection Run, Error, etc.)
+   - Status (Success, Failed)
+   - Date range
 
-## 🗂️ New Sidebar Tabs
+## 🎨 UI Tips
 
-The workspace sidebar now has these tabs:
+### Keyboard Shortcuts:
+- Collections tab: `⌘+1`
+- Chat tab: `⌘+2`
+- Logs tab: `⌘+3`
+- Analytics tab: `⌘+4`
 
-```
-📦 Collections  - Your API collections
-💬 Chat         - Team chat (NEW!)
-📊 Activity     - Activity feed (NEW!)
-👥 Team         - Team members (NEW!)
-🕐 History      - Request history
-🔗 Share        - Share workspace
-💻 Code         - Code snippets
-```
+### Collection Actions:
+- **Add Request**: Click the file+ icon
+- **Run Batch**: Click the play icon
+- **Edit Collection**: Right-click menu → Edit
+- **Delete Collection**: Right-click menu → Delete
 
----
+## 📁 File Locations
 
-## 🔑 Permission System
+If you need to customize:
+- **Batch Runner**: `src/modules/collections/components/batch-runner-dialog.tsx`
+- **Analytics**: `src/modules/workspace/components/analytics-dashboard.tsx`
+- **Report Generator**: `src/modules/collections/utils/report-generator.ts`
+- **Batch Logic**: `src/modules/collections/actions/batch-runner.ts`
 
-### What Each Role Can Do:
+## 🔧 Environment Variables
 
-| Feature | Viewer | Editor | Admin | Owner |
-|---------|:------:|:------:|:-----:|:-----:|
-| View collections | ✅ | ✅ | ✅ | ✅ |
-| Chat messages | ✅ | ✅ | ✅ | ✅ |
-| View activity | ✅ | ✅ | ✅ | ✅ |
-| **Invite members** | ❌ | ✅ | ✅ | ✅ |
-| **Request upgrade** | ✅ | ❌ | ❌ | ❌ |
-| **Approve requests** | ❌ | ❌ | ✅ | ✅ |
-| See notifications | ❌ | ❌ | ✅ | ✅ |
-
-**Key Changes:**
-- ❌ Viewers **cannot** send collaboration invite links anymore
-- ✅ Viewers **can** request to become Editors
-- ✅ Editors **can** now invite new members
-- ✅ Admins get notifications for role requests
-
----
-
-## 🎨 Visual Guide
-
-### Header Changes:
-
-**For Viewers:**
-```
-[Workspace Name]  [Request Editor Access]  [Profile]
+Make sure you have:
+```env
+DATABASE_URL="your-postgres-url"
+CLERK_SECRET_KEY="your-clerk-secret"
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your-clerk-key"
+GEMINI_API_KEY="your-gemini-key"
 ```
 
-**For Admins:**
-```
-[Workspace Name]  [🔔 2]  [Invite]  [Profile]
-                   ↑
-              Notification bell
-              with pending count
-```
+## 🌟 Feature Matrix
 
-### Chat Interface:
-```
-┌─────────────────────────────────┐
-│ Workspace Chat      2 online    │
-├─────────────────────────────────┤
-│                                 │
-│  👤 John                        │
-│     Hello team!                 │
-│     2 minutes ago               │
-│                                 │
-│  👤 Sarah                       │
-│     Hi! Ready to collaborate    │
-│     just now                    │
-│                                 │
-├─────────────────────────────────┤
-│ Type a message...        [Send] │
-└─────────────────────────────────┘
-```
+| Feature | Status | Location |
+|---------|--------|----------|
+| Batch Testing | ✅ Ready | Collection folders |
+| PDF Reports | ✅ Ready | Batch runner dialog |
+| JSON Export | ✅ Ready | Batch runner dialog |
+| Analytics Dashboard | ✅ Ready | Sidebar → Analytics |
+| Gemini AI Chat | ✅ Ready | Sidebar → Chat |
+| Activity Logs | ✅ Ready | Sidebar → Logs |
+| GitHub Review | ✅ Ready | Chat panel |
+| Collections | ✅ Ready | Sidebar → Collections |
 
----
+## 🎉 What's New
 
-## 🚀 Workflow Example
+### Just Implemented:
+- ✨ **Mass testing**: Run 10, 50, 100+ tests at once
+- 📄 **Professional PDF reports** with tables and metrics
+- 📊 **Analytics dashboard** with charts and trends
+- 🎮 **One-click batch execution** from collection folders
+- 📈 **Real-time progress tracking** during batch runs
+- 📥 **Export capabilities** (PDF + JSON)
 
-### Scenario: Viewer Wants Editor Access
-
-1. **Viewer** (Alice):
-   - Clicks "Request Editor Access"
-   - Writes: "I need to create collections for the new API"
-   - Submits request
-
-2. **System**:
-   - Saves request to database
-   - Logs activity: "Alice requested Editor role"
-   - Increments admin notification count
-
-3. **Admin** (Bob):
-   - Sees notification bell: 🔔 1
-   - Clicks bell → sees Alice's request
-   - Clicks request to review
-   - Sees message: "I need to create collections for the new API"
-   - Clicks "Approve"
-   - Confirms approval
-
-4. **System**:
-   - Updates Alice's role to EDITOR
-   - Logs activity: "Alice promoted to Editor by Bob"
-   - Creates notification for Alice
-   - Decrements admin notification count
-
-5. **Viewer** (Alice):
-   - Refreshes page
-   - Now has Editor permissions
-   - Can invite new members
-   - No longer sees "Request Editor Access" button
-
----
-
-## 🔧 Technical Notes
-
-### Real-time Updates via Polling:
-- **Chat**: Updates every 3 seconds
-- **Activity**: Updates every 5 seconds
-- **Team**: Updates every 10 seconds
-- **Notifications**: Updates every 30 seconds
-
-**Why polling, not WebSocket?**
-- Simpler implementation
-- Works with serverless (Vercel, etc.)
-- No connection management needed
-- Battery-friendly intervals
-- Automatic error recovery
-
-### Database:
-- All migrations applied ✅
-- Prisma client regenerated ✅
-- 4 new tables added:
-  - `RoleUpgradeRequest`
-  - `WorkspaceMessage`
-  - `WorkspaceActivity`
-  - `Notification`
-
-### Performance:
-- React Query caching prevents unnecessary requests
-- Optimistic updates for instant UI feedback
-- Database indexes on timestamps for fast queries
-
----
-
-## 📱 Mobile/Responsive
-
-All features work on mobile:
-- Sidebar tabs are scrollable
-- Chat input adapts to screen size
-- Dialogs are mobile-friendly
-- Touch-friendly buttons and icons
-
----
+### Coming from Existing Features:
+- 🤖 Gemini AI integration (already working)
+- 💬 Collaborative chat (already working)
+- 📝 Activity logging (already working)
+- 👥 Team workspaces (already working)
 
 ## 🐛 Troubleshooting
 
-### "I don't see the notification bell"
-- You need to be an **Admin** or **Owner** to see it
-- Viewers and Editors don't see the notification bell
+### If batch runner doesn't appear:
+- Make sure the collection has at least one request
+- The green play button only shows for collections with requests
 
-### "I can't invite members anymore"
-- If you're a **Viewer**, this is expected behavior
-- Request Editor access from an Admin
-- Editors and Admins can invite members
+### If analytics shows no data:
+- Run some tests first to generate data
+- Check that you're in the correct workspace
 
-### "Messages aren't showing up"
-- Wait 3 seconds - polling interval
+### If reports don't download:
+- Allow downloads in browser
 - Check browser console for errors
-- Ensure you're a workspace member
+- Make sure batch test completed successfully
 
-### "Role upgrade button not showing"
-- You must be a **Viewer** to see it
-- Editors and Admins don't need to request upgrades
+## 📞 Need Help?
 
----
+Check these files for implementation details:
+1. `IMPLEMENTATION_SUMMARY.md` - Full feature list
+2. `QUICK_START.md` (this file) - User guide
+3. `README.md` - Project overview
 
-## 🎉 That's It!
-
-You now have a **fully functional collaboration system**!
-
-### Next Steps:
-1. Test the role request flow with a Viewer account
-2. Try sending chat messages
-3. Watch the activity feed populate
-4. Invite new members (as Editor or Admin)
-
-### Documentation:
-- See `COMPLETE_COLLABORATION_SYSTEM.md` for full technical details
-- All components are in `src/modules/workspace/components/`
-- Server actions in `src/modules/workspace/actions/`
-
-**Enjoy collaborating!** 🚀
+Happy testing! 🚀

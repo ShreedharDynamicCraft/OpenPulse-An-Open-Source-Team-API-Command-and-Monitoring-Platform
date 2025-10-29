@@ -9,7 +9,7 @@ const LoginPage = () => {
       <div className='m-auto w-full max-w-md'>
         <div className='mb-6 text-center'>
           <Link href={"/"}>
-            <h1 className='text-2xl font-bold'>Postman</h1>
+            <h1 className='text-2xl font-bold'>API Command Hub</h1>
           </Link>
         </div>
         <SignIn 

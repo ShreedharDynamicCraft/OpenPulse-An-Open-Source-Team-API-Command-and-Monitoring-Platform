@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { ExternalLink, HelpCircle, Plus, Search, Loader, MessageSquare, FolderOpen, ScrollText } from 'lucide-react';
+import { ExternalLink, HelpCircle, Plus, Search, Loader, MessageSquare, FolderOpen, ScrollText, BarChart3 } from 'lucide-react';
 import React, { useState } from 'react';
 import CreateCollection from '../../collections/components/create-collection';
 import { useCollections } from '@/modules/collections/hooks/collections';
@@ -7,6 +7,7 @@ import EmptyCollections from '../../collections/components/empty-collections';
 import CollectionFolder from '@/modules/collections/components/collection-folder';
 import { WorkspaceChat } from './workspace-chat';
 import { ActivityLogsViewer } from './activity-logs-viewer';
+import { AnalyticsDashboard } from './analytics-dashboard';
 import { useUser } from '@clerk/nextjs';
 
 
@@ -33,6 +34,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
     { icon: FolderOpen, label: 'Collections' },
     { icon: MessageSquare, label: 'Chat' },
     { icon: ScrollText, label: 'Logs' },
+    { icon: BarChart3, label: 'Analytics' },
   ];
 
   const renderTabContent = () => {
@@ -49,6 +51,12 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
         return (
           <div className="flex flex-col h-full w-full overflow-hidden">
             <ActivityLogsViewer workspaceId={currentWorkspace?.id} />
+          </div>
+        );
+      case 'Analytics':
+        return (
+          <div className="flex flex-col h-full w-full overflow-auto">
+            <AnalyticsDashboard workspaceId={currentWorkspace?.id} />
           </div>
         );
       default:

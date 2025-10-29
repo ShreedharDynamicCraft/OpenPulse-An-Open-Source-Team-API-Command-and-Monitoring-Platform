@@ -343,7 +343,7 @@ model ChatMessage {
   
   // AI features
   aiResponse  Boolean     @default(false)
-  aiModel     String? // e.g., "gemini-1.5-pro"
+  aiModel     String? // e.g., "gemini-2.0-flash"
   aiPrompt    String?     @db.Text // Original prompt for AI messages
   
   // Code context (for code snippets and reviews)
