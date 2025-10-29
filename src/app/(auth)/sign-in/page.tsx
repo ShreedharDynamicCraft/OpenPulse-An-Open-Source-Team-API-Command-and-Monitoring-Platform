@@ -22,7 +22,6 @@ const LoginPage = () => {
           routing="path"
           path="/sign-in"
           signUpUrl="/sign-up"
-          forceRedirectUrl="/"
         />
       </div>
     </section>

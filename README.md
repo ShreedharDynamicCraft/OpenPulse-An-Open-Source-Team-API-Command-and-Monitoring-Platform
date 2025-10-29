@@ -1,12 +1,8 @@
 
-# Postman Clone
-
-<p align="center">
-  <img src="./public/post-man-clone.png" alt="Postman Clone" width="600"/>
-</p>
-
 A modern, open-source **Postman alternative** built with **Next.js 15, TypeScript, Prisma, TailwindCSS, shadcn/ui, TanStack Query, and Zustand**.  
 It provides a sleek UI and developer-focused workflow to test and manage REST APIs and WebSocket connections efficiently.
+
+**🆕 Now with AI-powered collaborative chat and comprehensive activity logging!**
 
 ---
 
@@ -33,6 +29,35 @@ It provides a sleek UI and developer-focused workflow to test and manage REST AP
 - Role-based workspace access (Admin, Member)  
 - View workspace members with overlapping avatars and hover tooltips  
 
+### 🆕 🔹 Collaborative Chat System
+- **Real-time workspace chat** for team collaboration  
+- Discuss API tests, share insights, and coordinate work  
+- **Markdown support** with code syntax highlighting  
+- **Message threading** for organized discussions  
+- **Emoji reactions** (👍, ❤️, 🧠, 🎉, 🔥) on messages  
+- File attachments support  
+- Infinite scroll with automatic updates (polls every 3 seconds)  
+
+### 🆕 🔹 AI Code Review (Gemini Integration)
+- **Ask @Gemini** for instant AI assistance  
+- **Code Review**: Get detailed feedback on code quality, security, and performance  
+- **Code Explanation**: Understand complex code snippets  
+- **Code Optimization**: Receive optimization suggestions  
+- **Test Generation**: Auto-generate test cases  
+- **GitHub Repository Analysis**: Review entire repositories with AI  
+- Supports multiple programming languages  
+- AI responses formatted in beautiful markdown with syntax highlighting  
+
+### 🆕 🔹 Activity Logs & Test Tracking
+- **Comprehensive activity logging** for all workspace actions  
+- Track **test runs** with status, duration, and response codes  
+- Monitor **collection runs** with pass/fail statistics  
+- View **API calls**, **errors**, and **system events**  
+- **Filter logs** by type, status, and user  
+- **Timeline view** with detailed metadata  
+- Logs automatically posted to chat for team visibility  
+- Export and analyze logs programmatically  
+
 ### 🔹 Additional Utilities
 - Raw request body editor powered by **Monaco Editor**  
 - JSON pretty print & validation  
@@ -53,6 +78,8 @@ It provides a sleek UI and developer-focused workflow to test and manage REST AP
 - **Icons:** Lucide-react  
 - **Editor:** Monaco Editor  
 - **Auth:** Clerk  
+- **AI:** Google Gemini API (gemini-1.5-pro)  
+- **Markdown:** react-markdown + react-syntax-highlighter  
 - **Deployment:** Vercel  
 
 ---

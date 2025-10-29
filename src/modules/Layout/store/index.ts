@@ -3,6 +3,8 @@ import { create } from "zustand";
 type Workspace = {
   id: string;
   name: string;
+  ownerId?: string;
+  description?: string;
 };
 
 interface WorkspaceState {

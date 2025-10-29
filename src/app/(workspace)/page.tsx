@@ -17,7 +17,7 @@ const Page = () => {
   const { selectedWorkspace } = useWorkspaceStore();
   const { data: currentWorkspace, isLoading } = useGetWorkspace( selectedWorkspace?.id!);
 
-  if (isLoading) {
+  if (isLoading || !selectedWorkspace?.id) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <Loader className="animate-spin h-6 w-6 text-indigo-500" />

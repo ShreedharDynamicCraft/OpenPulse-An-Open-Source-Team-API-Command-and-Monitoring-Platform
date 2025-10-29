@@ -34,6 +34,25 @@ export const acceptWorkspaceInvite = async (token: string) => {
 
   if (!invite.expiresAt || invite.expiresAt < new Date()) throw new Error("Invite expired");
 
+  // Check if user is already a member
+  const existingMember = await db.workspaceMember.findUnique({
+    where: {
+      userId_workspaceId: {
+        userId: user.id,
+        workspaceId: invite.workspaceId,
+      },
+    },
+  });
+
+  if (existingMember) {
+    // User is already a member, just delete the invite
+    await db.workspaceInvite.delete({
+      where: { id: invite.id },
+    });
+    return { success: true, alreadyMember: true, workspaceId: invite.workspaceId };
+  }
+
+  // Create new workspace member
   await db.workspaceMember.create({
     data: {
       userId: user.id,
@@ -42,12 +61,13 @@ export const acceptWorkspaceInvite = async (token: string) => {
     },
   });
 
+  // Delete the used invite
   await db.workspaceInvite.delete({
     where: { id: invite.id },
   });
 
   
-  return { success: true };
+  return { success: true, alreadyMember: false, workspaceId: invite.workspaceId };
 };
 
 export const getAllWorkspaceMembers = async (workspaceId: string) => {

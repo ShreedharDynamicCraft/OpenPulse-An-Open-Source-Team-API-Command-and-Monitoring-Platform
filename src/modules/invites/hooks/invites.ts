@@ -30,8 +30,8 @@ export const useAcceptWorkspaceInvite = () => {
 export const useGetWorkspaceMemebers = (workspaceId: string)=>{
 
   return useQuery({
-    queryKey: ["workspace-members"],
+    queryKey: ["workspace-members", workspaceId],
     queryFn: async () => getAllWorkspaceMembers(workspaceId),
-    
+    enabled: !!workspaceId, // Only fetch when workspaceId exists
   });
 }
