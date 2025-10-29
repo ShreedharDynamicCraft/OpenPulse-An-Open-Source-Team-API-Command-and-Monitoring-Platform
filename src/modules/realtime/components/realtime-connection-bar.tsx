@@ -35,18 +35,6 @@ const RealtimeConnectionBar = () => {
     } else {
       // Connect to WebSocket
       connect(url, {
-        onOpen: (event) => {
-          console.log('Successfully connected to:', url)
-        },
-        onClose: (event) => {
-          console.log('Disconnected from WebSocket')
-        },
-        onError: (error) => {
-          console.error('WebSocket connection error:', error)
-        },
-        onMessage: (event) => {
-          console.log('Received message:', event.data)
-        },
         autoReconnect: true,
         reconnectDelay: 3000
       })

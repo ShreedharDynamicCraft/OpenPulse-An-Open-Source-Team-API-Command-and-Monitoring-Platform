@@ -135,16 +135,27 @@ App will be available at: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 📦 Project Structure
+## � Documentation
+
+- **[Complete Documentation](./DOCUMENTATION.md)** - Comprehensive guide covering all features
+- **[Quick Start Guide](./QUICK_START.md)** - Get started in 5 minutes
+
+---
+
+## �📦 Project Structure
 
 ```
 /app
   /api             → API routes (REST & WebSocket server actions)
   /(workspace)     → Workspace-specific routes
+    /code-editor   → Standalone AI code editor with analysis
+    /design        → Design system with tldraw
+    /realtime      → Real-time collaboration features
   /invite          → Invite link pages
 /components        → Reusable UI components
-/modules           → Features (auth, invites, requests, websockets, etc.)
+/modules           → Features (auth, invites, requests, websockets, AI, etc.)
 /lib               → Utilities (db, auth, store)
+/prisma            → Database schema and migrations
 ```
 
 ---
