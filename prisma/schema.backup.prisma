@@ -43,16 +43,13 @@ model Workspace {
   environments Environment[]
 
   websocketPresets WebSocketPreset[]
-  
+
   // 🆕 Chat & Activity features
-  chatMessages    ChatMessage[]
-  activityLogs    ActivityLog[]
-  
-  // 🎨 Design & System Design features
-  designProjects  DesignProject[]
-  
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @default(now()) @updatedAt
+  chatMessages ChatMessage[]
+  activityLogs ActivityLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([name, ownerId])
 }
@@ -343,38 +340,38 @@ model ChatMessage {
   userId      String? // Null for system/AI messages
   content     String      @db.Text
   type        MessageType @default(TEXT)
-  
+
   // AI features
-  aiResponse  Boolean     @default(false)
-  aiModel     String? // e.g., "gemini-2.0-flash"
-  aiPrompt    String?     @db.Text // Original prompt for AI messages
-  
+  aiResponse Boolean @default(false)
+  aiModel    String? // e.g., "gemini-2.0-flash"
+  aiPrompt   String? @db.Text // Original prompt for AI messages
+
   // Code context (for code snippets and reviews)
   codeLanguage String? // e.g., "typescript", "javascript"
   githubUrl    String? // GitHub repo URL if AI review was from repo
-  
+
   // Threading
-  parentId    String? // For threaded replies
-  parent      ChatMessage?  @relation("MessageThread", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  replies     ChatMessage[] @relation("MessageThread")
-  
+  parentId String? // For threaded replies
+  parent   ChatMessage?  @relation("MessageThread", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  replies  ChatMessage[] @relation("MessageThread")
+
   // Reactions
-  reactions   MessageReaction[]
-  
+  reactions MessageReaction[]
+
   // Attachments
   attachmentUrl  String? // S3 or cloud storage URL
   attachmentName String?
   attachmentType String? // file extension or MIME type
   attachmentSize Int? // bytes
-  
+
   // Metadata
-  metadata    Json? // For extensibility
-  
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  metadata Json? // For extensibility
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([workspaceId, createdAt])
   @@index([parentId])
   @@index([userId, workspaceId])
@@ -382,15 +379,15 @@ model ChatMessage {
 
 // Emoji reactions on messages
 model MessageReaction {
-  id        String   @id @default(cuid())
+  id        String @id @default(cuid())
   messageId String
   userId    String
   emoji     String // e.g., "👍", "❤️", "🧠"
-  
-  message   ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  
+
+  message ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
-  
+
   @@unique([messageId, userId, emoji])
   @@index([messageId])
 }
@@ -411,27 +408,27 @@ enum LogType {
 
 // Comprehensive activity logging
 model ActivityLog {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   workspaceId String
   userId      String? // Null for system events
   type        LogType
   title       String // Short description
   details     Json // Full log data
-  
+
   // Test run specific
-  status      String? // "success", "failed", "error"
-  duration    Int? // milliseconds
-  statusCode  Int? // HTTP status
-  
+  status     String? // "success", "failed", "error"
+  duration   Int? // milliseconds
+  statusCode Int? // HTTP status
+
   // Links
-  requestId      String? // Link to Request if applicable
-  collectionId   String? // Link to Collection if applicable
-  relatedChatId  String? // Link to chat message if posted to chat
-  
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  
-  createdAt   DateTime @default(now())
-  
+  requestId     String? // Link to Request if applicable
+  collectionId  String? // Link to Collection if applicable
+  relatedChatId String? // Link to chat message if posted to chat
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
   @@index([workspaceId, createdAt])
   @@index([userId, createdAt])
   @@index([type, workspaceId])
@@ -448,24 +445,24 @@ enum ReviewType {
 }
 
 enum ReviewSessionType {
-  PROJECT_BASED    // Review belongs to a project
-  STANDALONE       // Quick review without project
+  PROJECT_BASED // Review belongs to a project
+  STANDALONE // Quick review without project
 }
 
 // Code Review Projects (like Collections for API testing)
 model CodeReviewProject {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   workspaceId String
   name        String
   description String?
   createdBy   String
-  
+
   // Hierarchical structure - sessions belong to projects
-  sessions    CodeReviewSession[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  sessions CodeReviewSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([workspaceId])
   @@index([createdBy])
 }
@@ -473,43 +470,43 @@ model CodeReviewProject {
 // Code Review Sessions (like Requests in Collections)
 // Each session represents one review with its history
 model CodeReviewSession {
-  id          String             @id @default(cuid())
+  id          String @id @default(cuid())
   workspaceId String
   userId      String
-  
+
   // Project association (optional for standalone reviews)
-  projectId   String?
-  project     CodeReviewProject? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  sessionType ReviewSessionType  @default(STANDALONE)
+  projectId String?
+  project   CodeReviewProject? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  sessionType ReviewSessionType @default(STANDALONE)
   reviewType  ReviewType
-  
+
   // Session metadata
-  name        String             // e.g., "Login Component Review", "API Refactoring"
+  name        String // e.g., "Login Component Review", "API Refactoring"
   description String?
-  
+
   // Original code/files being reviewed
-  code        String?            @db.Text
-  language    String?
-  filesPaths  Json?              // Array of file paths for GitHub reviews
-  
+  code       String? @db.Text
+  language   String?
+  filesPaths Json? // Array of file paths for GitHub reviews
+
   // Review configuration
-  tone        String?            // "gentle", "balanced", "direct"
-  model       String             // AI model used
-  
+  tone  String? // "gentle", "balanced", "direct"
+  model String // AI model used
+
   // Comments/feedback being transformed
-  originalComments Json?         // Array of harsh comments
-  
+  originalComments Json? // Array of harsh comments
+
   // History of review iterations
-  logs        CodeReviewLog[]
-  
+  logs CodeReviewLog[]
+
   // Metadata
-  tags        Json?              // Array of tags for categorization
-  isFavorite  Boolean            @default(false)
-  
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  
+  tags       Json? // Array of tags for categorization
+  isFavorite Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([workspaceId])
   @@index([userId])
   @@index([projectId])
@@ -522,312 +519,23 @@ model CodeReviewLog {
   id        String            @id @default(cuid())
   sessionId String
   session   CodeReviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  
+
   // Review execution details
-  response    String   @db.Text  // AI-generated review
-  model       String             // Model used for this iteration
-  tone        String?            // Tone used
-  duration    Int?               // milliseconds
-  
+  response String  @db.Text // AI-generated review
+  model    String // Model used for this iteration
+  tone     String? // Tone used
+  duration Int? // milliseconds
+
   // Snapshot of inputs at time of review
   codeSnapshot     String? @db.Text
-  commentsSnapshot Json?   // Comments at time of review
-  
+  commentsSnapshot Json? // Comments at time of review
+
   // Execution metadata
-  status      String   @default("success") // "success", "failed", "error"
-  error       String?  @db.Text
-  
-  createdAt   DateTime @default(now())
-  
+  status String  @default("success") // "success", "failed", "error"
+  error  String? @db.Text
+
+  createdAt DateTime @default(now())
+
   @@index([sessionId, createdAt])
   @@index([status])
-}
-
-//
-// ─── DESIGN SYSTEM & COLLABORATION ──────────────────────────────────────
-//
-
-enum DesignRole {
-  OWNER
-  DESIGNER
-  COLLABORATOR
-  VIEWER
-}
-
-enum ExportFormat {
-  PNG
-  SVG
-  PDF
-  FIG
-  JSON
-  REACT
-}
-
-enum SuggestionType {
-  COLOR_PALETTE
-  TYPOGRAPHY
-  SPACING
-  ACCESSIBILITY
-  COMPONENT
-  LAYOUT
-  COPY
-}
-
-// Design Projects (top-level container)
-model DesignProject {
-  id          String   @id @default(cuid())
-  workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  
-  name        String
-  description String?  @db.Text
-  ownerId     String
-  
-  // Organization
-  files       DesignFile[]
-  permissions DesignPermission[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([workspaceId])
-  @@index([ownerId])
-}
-
-// Design Files (individual design documents)
-model DesignFile {
-  id          String   @id @default(cuid())
-  projectId   String
-  project     DesignProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  // File metadata
-  title       String
-  description String?  @db.Text
-  thumbnailUrl String?
-  
-  // Figma integration
-  figmaFileId    String?  @unique
-  figmaFileKey   String?
-  figmaNodeId    String?  // Specific node/frame if applicable
-  connectedByUserId String?
-  lastSyncedAt   DateTime?
-  
-  // Versioning
-  latestVersionId String?
-  versions        DesignVersion[]
-  
-  // Collaboration
-  comments    DesignComment[]
-  suggestions AISuggestion[]
-  permissions DesignPermission[]
-  shares      DesignShare[]
-  
-  // Metadata
-  metadata    Json?    // Layer structure, components, etc.
-  tags        Json?    // Array of tags
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([projectId])
-  @@index([figmaFileId])
-  @@index([connectedByUserId])
-}
-
-// Design Versions (snapshots/history)
-model DesignVersion {
-  id          String     @id @default(cuid())
-  fileId      String
-  file        DesignFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  
-  versionTag  String     // v1.0, v1.1, etc.
-  description String?    @db.Text
-  
-  // Snapshot data
-  snapshotUrl String?    // URL to full snapshot image/data
-  thumbnailUrl String?
-  metadata    Json?      // Full metadata snapshot
-  
-  // Exports attached to this version
-  exports     DesignExport[]
-  
-  createdBy   String
-  createdAt   DateTime @default(now())
-  
-  @@index([fileId, createdAt])
-  @@index([createdBy])
-}
-
-// Design Comments (inline feedback)
-model DesignComment {
-  id          String     @id @default(cuid())
-  fileId      String
-  file        DesignFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  
-  // Comment location
-  nodeId      String?    // Figma node ID or layer ID
-  positionX   Float?     // Canvas position
-  positionY   Float?
-  
-  // Content
-  userId      String
-  content     String     @db.Text
-  resolved    Boolean    @default(false)
-  resolvedBy  String?
-  resolvedAt  DateTime?
-  
-  // Threading (optional)
-  parentId    String?
-  replies     DesignComment[] @relation("CommentReplies")
-  parent      DesignComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  
-  @@index([fileId, resolved])
-  @@index([userId])
-  @@index([parentId])
-}
-
-// AI Design Suggestions (Gemini-powered)
-model AISuggestion {
-  id          String         @id @default(cuid())
-  fileId      String
-  file        DesignFile     @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  
-  nodeId      String?        // Target node/frame
-  suggestionType SuggestionType
-  
-  // Suggestion content
-  title       String
-  description String?        @db.Text
-  payload     Json           // Structured suggestion data (colors, tokens, code, etc.)
-  
-  // User interaction
-  accepted    Boolean        @default(false)
-  acceptedBy  String?
-  acceptedAt  DateTime?
-  
-  // Applied to version
-  appliedToVersionId String?
-  
-  createdAt   DateTime       @default(now())
-  
-  @@index([fileId, suggestionType])
-  @@index([accepted])
-}
-
-// Design Exports (generated assets)
-model DesignExport {
-  id          String        @id @default(cuid())
-  versionId   String
-  version     DesignVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
-  
-  format      ExportFormat
-  fileUrl     String        // S3/CDN URL
-  fileName    String
-  fileSize    Int?          // bytes
-  
-  // Export metadata
-  options     Json?         // Export settings used
-  
-  // Access
-  downloadCount Int         @default(0)
-  
-  createdBy   String
-  createdAt   DateTime      @default(now())
-  
-  @@index([versionId, format])
-  @@index([createdBy])
-}
-
-// Design Permissions (RBAC for files and projects)
-model DesignPermission {
-  id           String    @id @default(cuid())
-  
-  // Resource (project OR file)
-  resourceType String    // "project" or "file"
-  projectId    String?
-  project      DesignProject? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  fileId       String?
-  file         DesignFile?    @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  
-  // User or team
-  userId       String
-  role         DesignRole
-  
-  grantedBy    String
-  grantedAt    DateTime  @default(now())
-  
-  @@unique([resourceType, projectId, fileId, userId])
-  @@index([userId, role])
-  @@index([projectId])
-  @@index([fileId])
-}
-
-// Design Shares (public/private share links)
-model DesignShare {
-  id          String     @id @default(cuid())
-  fileId      String
-  file        DesignFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  
-  // Share settings
-  token       String     @unique @default(cuid())
-  role        DesignRole @default(VIEWER)
-  
-  // Access control
-  password    String?    // Hashed password
-  expiresAt   DateTime?
-  maxViews    Int?
-  viewCount   Int        @default(0)
-  
-  // Metadata
-  createdBy   String
-  createdAt   DateTime   @default(now())
-  lastAccessedAt DateTime?
-  
-  @@index([token])
-  @@index([fileId])
-  @@index([expiresAt])
-}
-
-// Figma OAuth Tokens (encrypted)
-model FigmaConnection {
-  id           String   @id @default(cuid())
-  userId       String   @unique
-  
-  // OAuth tokens (should be encrypted in app)
-  accessToken  String   @db.Text
-  refreshToken String?  @db.Text
-  expiresAt    DateTime?
-  
-  // Figma user info
-  figmaUserId  String?
-  figmaEmail   String?
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  
-  @@index([userId])
-}
-
-// Design Activity Log (audit trail)
-model DesignActivity {
-  id          String   @id @default(cuid())
-  
-  // Resource
-  fileId      String?
-  projectId   String?
-  
-  // Action
-  userId      String
-  action      String   // "created", "updated", "commented", "exported", "shared", etc.
-  description String?  @db.Text
-  metadata    Json?    // Additional context
-  
-  createdAt   DateTime @default(now())
-  
-  @@index([fileId, createdAt])
-  @@index([projectId, createdAt])
-  @@index([userId])
 }

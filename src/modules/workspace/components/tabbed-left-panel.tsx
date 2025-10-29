@@ -1,7 +1,7 @@
 "use client";
 
 import { Hint } from "@/components/ui/hint";
-import { Globe, Link as LinkIcon, Code2 } from "lucide-react";
+import { Globe, Link as LinkIcon, Code2, Palette } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -14,6 +14,7 @@ const TabbedLeftPanel = () => {
         { icon: LinkIcon, label: "rest", link: "/" },
         { icon: Globe, label: "realtime", link: "/realtime" },
         { icon: Code2, label: "code-review", link: "/code-review" },
+        { icon: Palette, label: "design", link: "/design" },
     ];
 
     return (

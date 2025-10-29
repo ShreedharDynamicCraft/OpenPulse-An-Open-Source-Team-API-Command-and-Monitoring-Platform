@@ -34,8 +34,6 @@ const InviteMember = () => {
 
   const { data: currentRole } = useGetCurrentMemberRole(selectedWorkspace?.id || '');
 
-  console.log("Selected Workspace members: ", workspaceMembers);
-
   // Admins and Editors can invite (Viewers cannot)
   const canInvite = currentRole === MEMBER_ROLE.ADMIN || currentRole === MEMBER_ROLE.EDITOR;
 
@@ -90,22 +88,26 @@ const InviteMember = () => {
             <div className="flex -space-x-2 overflow-hidden mb-3">
               {isLoading ? (
                 <p className="text-xs text-muted-foreground">Loading members...</p>
+              ) : workspaceMembers && workspaceMembers.length > 0 ? (
+                <>
+                  {workspaceMembers.slice(0, 5).map((member: any) => (
+                    <Hint key={member.id} label={member.user.name || "Unknown User"}>
+                      <Avatar className="border-2 border-background size-8 mt-2">
+                        <AvatarImage src={member.user.image || ""} />
+                        <AvatarFallback>
+                          {member.user.name?.charAt(0) || "?"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Hint>
+                  ))}
+                  {workspaceMembers.length > 5 && (
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700 border-2 border-background text-xs font-semibold">
+                      +{workspaceMembers.length - 5}
+                    </div>
+                  )}
+                </>
               ) : (
-                workspaceMembers?.slice(0, 5).map((member: any) => (
-                  <Hint key={member.id} label={member.user.name || "Unknown User"}>
-                    <Avatar className="border-2 border-background size-8 mt-2">
-                      <AvatarImage src={member.user.image || ""} />
-                      <AvatarFallback>
-                        {member.user.name?.charAt(0) || "?"}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Hint>
-                ))
-              )}
-              {workspaceMembers && workspaceMembers.length > 5 && (
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700 border-2 border-background text-xs font-semibold">
-                  +{workspaceMembers.length - 5}
-                </div>
+                <p className="text-xs text-muted-foreground">No members yet</p>
               )}
             </div>
 

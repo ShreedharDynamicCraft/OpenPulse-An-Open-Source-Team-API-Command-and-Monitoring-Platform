@@ -188,9 +188,10 @@ export default function WorkspaceMembersDialog({
                               handleRoleChange(member.id, value as MEMBER_ROLE)
                             }
                             disabled={updateRole.isPending}
+                            defaultValue={member.role || MEMBER_ROLE.VIEWER}
                           >
                             <SelectTrigger className="w-32">
-                              <SelectValue />
+                              <SelectValue placeholder="Select role" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value={MEMBER_ROLE.ADMIN}>
