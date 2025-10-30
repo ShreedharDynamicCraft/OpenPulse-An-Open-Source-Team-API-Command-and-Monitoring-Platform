@@ -6,6 +6,8 @@ import {
   addMessageReaction,
   removeMessageReaction,
   getMessageReplies,
+  deleteMessageForMe,
+  deleteMessageForEveryone,
 } from "../actions/chat";
 import { getActivityLogs } from "../actions/activity-logs";
 import { useUser } from "@clerk/nextjs";
@@ -210,5 +212,51 @@ export function useOnlineUsers(workspaceId: string) {
       return user ? [{ id: user.id, name: user.fullName || "You" }] : [];
     },
     refetchInterval: 10000, // Poll every 10 seconds
+  });
+}
+
+/**
+ * Hook to delete a message for yourself only
+ */
+export function useDeleteMessageForMe(workspaceId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { messageId: string }) => {
+      const result = await deleteMessageForMe({
+        workspaceId,
+        messageId: data.messageId,
+      });
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      return result.message;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workspace-chat", workspaceId] });
+    },
+  });
+}
+
+/**
+ * Hook to delete a message for everyone (sender only)
+ */
+export function useDeleteMessageForEveryone(workspaceId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { messageId: string }) => {
+      const result = await deleteMessageForEveryone({
+        workspaceId,
+        messageId: data.messageId,
+      });
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      return result.message;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workspace-chat", workspaceId] });
+    },
   });
 }

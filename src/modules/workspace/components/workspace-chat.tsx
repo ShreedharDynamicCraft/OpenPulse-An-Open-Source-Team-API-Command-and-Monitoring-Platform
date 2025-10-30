@@ -17,8 +17,23 @@ import {
   MessageSquare,
   Smile,
   X,
+  MoreVertical,
+  Trash2,
 } from "lucide-react";
-import { useWorkspaceChat, useSendMessage, useAICodeReview, useAddReaction } from "../hooks/use-chat";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { 
+  useWorkspaceChat, 
+  useSendMessage, 
+  useAICodeReview, 
+  useAddReaction,
+  useDeleteMessageForMe,
+  useDeleteMessageForEveryone
+} from "../hooks/use-chat";
 import { useUser } from "@clerk/nextjs";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -35,6 +50,7 @@ interface Message {
   codeLanguage?: string;
   userName?: string;
   userImage?: string;
+  userId?: string;
   createdAt: string;
   aiResponse?: boolean;
   reactions?: Array<{ emoji: string; userId: string }>;
@@ -70,6 +86,8 @@ export function WorkspaceChat({ workspaceId }: WorkspaceChatProps) {
   const sendMessageMutation = useSendMessage(workspaceId);
   const aiReviewMutation = useAICodeReview(workspaceId);
   const addReactionMutation = useAddReaction(workspaceId);
+  const deleteForMeMutation = useDeleteMessageForMe(workspaceId);
+  const deleteForEveryoneMutation = useDeleteMessageForEveryone(workspaceId);
 
   // Flatten all messages from pages
   const messages: Message[] = data?.pages.flatMap((page) => page.messages).reverse() || [];
@@ -122,6 +140,22 @@ export function WorkspaceChat({ workspaceId }: WorkspaceChatProps) {
       await addReactionMutation.mutateAsync({ messageId, emoji });
     } catch (error) {
       console.error("Failed to add reaction:", error);
+    }
+  };
+
+  const handleDeleteForMe = async (messageId: string) => {
+    try {
+      await deleteForMeMutation.mutateAsync({ messageId });
+    } catch (error) {
+      console.error("Failed to delete message:", error);
+    }
+  };
+
+  const handleDeleteForEveryone = async (messageId: string) => {
+    try {
+      await deleteForEveryoneMutation.mutateAsync({ messageId });
+    } catch (error) {
+      console.error("Failed to delete message for everyone:", error);
     }
   };
 
@@ -340,6 +374,8 @@ export function WorkspaceChat({ workspaceId }: WorkspaceChatProps) {
                   message={msg}
                   currentUserId={user?.id}
                   onReaction={handleReaction}
+                  onDeleteForMe={handleDeleteForMe}
+                  onDeleteForEveryone={handleDeleteForEveryone}
                 />
               ))}
               <div ref={messagesEndRef} />
@@ -388,15 +424,24 @@ export function WorkspaceChat({ workspaceId }: WorkspaceChatProps) {
 }
 
 interface MessageBubbleProps {
-  message: Message;
+  message: Message & { userId?: string };
   currentUserId?: string;
   onReaction: (messageId: string, emoji: string) => void;
+  onDeleteForMe: (messageId: string) => void;
+  onDeleteForEveryone: (messageId: string) => void;
 }
 
-function MessageBubble({ message, currentUserId, onReaction }: MessageBubbleProps) {
+function MessageBubble({ 
+  message, 
+  currentUserId, 
+  onReaction,
+  onDeleteForMe,
+  onDeleteForEveryone 
+}: MessageBubbleProps) {
   const isAI = message.aiResponse || message.type === "AI_RESPONSE";
   const isSystem = message.type === "SYSTEM";
   const [showReactions, setShowReactions] = useState(false);
+  const isMessageOwner = message.userId === currentUserId;
 
   const reactions = ["👍", "❤️", "🧠", "🎉", "🔥"];
 
@@ -434,26 +479,61 @@ function MessageBubble({ message, currentUserId, onReaction }: MessageBubbleProp
         </Avatar>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-            <span className="font-semibold text-xs">
-              {isAI ? "AI Assistant" : isSystem ? "System" : message.userName || "Unknown User"}
-            </span>
-            {isAI && (
-              <span className="text-[9px] bg-indigo-600 px-1.5 py-0.5 rounded-full font-medium">
-                Gemini
+          <div className="flex items-center justify-between gap-1.5 mb-1 flex-wrap">
+            <div className="flex items-center gap-1.5">
+              <span className="font-semibold text-xs">
+                {isAI ? "AI Assistant" : isSystem ? "System" : message.userName || "Unknown User"}
               </span>
-            )}
-            {isSystem && (
-              <span className="text-[9px] bg-amber-600 px-1.5 py-0.5 rounded-full font-medium">
-                Auto
+              {isAI && (
+                <span className="text-[9px] bg-indigo-600 px-1.5 py-0.5 rounded-full font-medium">
+                  Gemini
+                </span>
+              )}
+              {isSystem && (
+                <span className="text-[9px] bg-amber-600 px-1.5 py-0.5 rounded-full font-medium">
+                  Auto
+                </span>
+              )}
+              <span className="text-[10px] text-zinc-500">
+                {new Date(message.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </span>
+            </div>
+
+            {/* Delete Menu - Only show for non-AI and non-System messages */}
+            {!isAI && !isSystem && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-5 w-5 p-0 hover:bg-zinc-800"
+                  >
+                    <MoreVertical className="w-3.5 h-3.5 text-zinc-400" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem
+                    onClick={() => onDeleteForMe(message.id)}
+                    className="text-xs cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 mr-2" />
+                    Delete for me
+                  </DropdownMenuItem>
+                  {isMessageOwner && (
+                    <DropdownMenuItem
+                      onClick={() => onDeleteForEveryone(message.id)}
+                      className="text-xs cursor-pointer text-red-400 focus:text-red-400"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 mr-2" />
+                      Delete for everyone
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
-            <span className="text-[10px] text-zinc-500">
-              {new Date(message.createdAt).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
           </div>
 
           {/* Message Content */}

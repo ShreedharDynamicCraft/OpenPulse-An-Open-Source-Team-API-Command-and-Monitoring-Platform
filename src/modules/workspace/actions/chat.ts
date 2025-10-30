@@ -108,6 +108,7 @@ export async function getChatMessages(workspaceId: string, cursor?: string, limi
       where: {
         workspaceId: workspaceId,
         parentId: null, // Only root messages, not replies
+        deletedForEveryone: false, // Don't show messages deleted for everyone
       },
       take: limit + 1, // Take one more to check if there are more pages
       ...(cursor && {
@@ -138,9 +139,15 @@ export async function getChatMessages(workspaceId: string, cursor?: string, limi
       },
     });
 
+    // Filter out messages deleted for this user
+    const filteredMessages = messages.filter((msg) => {
+      const deletedForUsers = (msg.deletedForUsers as string[]) || [];
+      return !deletedForUsers.includes(userId);
+    });
+
     // Check if there are more pages
-    const hasMore = messages.length > limit;
-    const messagesToReturn = hasMore ? messages.slice(0, -1) : messages;
+    const hasMore = filteredMessages.length > limit;
+    const messagesToReturn = hasMore ? filteredMessages.slice(0, -1) : filteredMessages;
 
     // Get user info for each message
     const messagesWithUserInfo = await Promise.all(
@@ -465,5 +472,114 @@ export async function getMessageReplies(messageId: string, workspaceId: string) 
   } catch (error: any) {
     console.error("Get replies error:", error);
     return { success: false, error: error.message || "Failed to fetch replies" };
+  }
+}
+
+/**
+ * Delete message for myself (only hides it from my view)
+ */
+export async function deleteMessageForMe(data: { workspaceId: string; messageId: string }) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Verify membership
+    const membership = await db.workspaceMember.findUnique({
+      where: {
+        userId_workspaceId: {
+          userId: userId,
+          workspaceId: data.workspaceId,
+        },
+      },
+    });
+
+    if (!membership) {
+      return { success: false, error: "Not a member of this workspace" };
+    }
+
+    // Get the message
+    const message = await db.chatMessage.findUnique({
+      where: { id: data.messageId },
+    });
+
+    if (!message) {
+      return { success: false, error: "Message not found" };
+    }
+
+    // Add user ID to deletedForUsers array
+    const deletedForUsers = (message.deletedForUsers as string[]) || [];
+    if (!deletedForUsers.includes(userId)) {
+      deletedForUsers.push(userId);
+    }
+
+    await db.chatMessage.update({
+      where: { id: data.messageId },
+      data: {
+        deletedForUsers: deletedForUsers,
+      },
+    });
+
+    revalidatePath(`/workspace/${data.workspaceId}`);
+    return { success: true };
+  } catch (error: any) {
+    console.error("Delete message for me error:", error);
+    return { success: false, error: error.message || "Failed to delete message" };
+  }
+}
+
+/**
+ * Delete message for everyone (permanently removes it)
+ * Only the message sender can do this
+ */
+export async function deleteMessageForEveryone(data: { workspaceId: string; messageId: string }) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Verify membership
+    const membership = await db.workspaceMember.findUnique({
+      where: {
+        userId_workspaceId: {
+          userId: userId,
+          workspaceId: data.workspaceId,
+        },
+      },
+    });
+
+    if (!membership) {
+      return { success: false, error: "Not a member of this workspace" };
+    }
+
+    // Get the message and verify ownership
+    const message = await db.chatMessage.findUnique({
+      where: { id: data.messageId },
+    });
+
+    if (!message) {
+      return { success: false, error: "Message not found" };
+    }
+
+    if (message.userId !== userId) {
+      return { success: false, error: "You can only delete your own messages" };
+    }
+
+    // Mark as deleted for everyone
+    await db.chatMessage.update({
+      where: { id: data.messageId },
+      data: {
+        deletedForEveryone: true,
+        content: "This message was deleted",
+      },
+    });
+
+    revalidatePath(`/workspace/${data.workspaceId}`);
+    return { success: true };
+  } catch (error: any) {
+    console.error("Delete message for everyone error:", error);
+    return { success: false, error: error.message || "Failed to delete message" };
   }
 }
