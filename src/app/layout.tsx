@@ -29,6 +29,7 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning className="h-full">
         <body
           className={`${poppins.className} antialiased h-full overflow-hidden`}
+          suppressHydrationWarning
         >
           <QueryProvider>
             <ThemeProvider 
