@@ -1,17 +1,18 @@
 "use client";
 
 import { Hint } from "@/components/ui/hint";
-import { Globe, Link as LinkIcon, Code2, Palette, FileCode } from "lucide-react";
+import { Globe, Link as LinkIcon, Code2, Palette, FileCode, Home } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
 const TabbedLeftPanel = () => {
     const pathname = usePathname();
-    const activeTab = pathname.split("/")[1] || "rest"; // default to "rest" on home
+    const activeTab = pathname === "/" ? "home" : pathname.split("/")[1] || "home"; // default to "home" on root
 
     const sidebarItems = [
-        { icon: LinkIcon, label: "rest", link: "/" },
+        { icon: Home, label: "home", link: "/" },
+        { icon: LinkIcon, label: "rest", link: "/rest" },
         { icon: Globe, label: "realtime", link: "/realtime" },
         { icon: Palette, label: "design", link: "/design" },
         { icon: FileCode, label: "code-editor", link: "/code-editor" },
