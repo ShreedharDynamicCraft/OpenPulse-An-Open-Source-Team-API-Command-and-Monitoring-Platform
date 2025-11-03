@@ -87,55 +87,55 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
     <div className="space-y-6">
       {/* Header with Stats */}
       <div>
-        <h2 className="text-2xl font-bold text-white flex items-center gap-2 mb-4">
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 mb-4">
           <Activity className="w-6 h-6 text-indigo-500" />
           Code Review Activity Logs
         </h2>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border-indigo-500/30">
+          <Card className="bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-500/20 dark:to-purple-500/20 border-indigo-300 dark:border-indigo-500/30">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Total Reviews</p>
-                  <p className="text-2xl font-bold text-white">{stats.total}</p>
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">{stats.total}</p>
                 </div>
                 <Brain className="w-8 h-8 text-indigo-400" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-pink-500/20 to-rose-500/20 border-pink-500/30">
+          <Card className="bg-gradient-to-br from-pink-100 to-rose-100 dark:from-pink-500/20 dark:to-rose-500/20 border-pink-300 dark:border-pink-500/30">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Empathetic</p>
-                  <p className="text-2xl font-bold text-white">{stats.empathetic}</p>
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">{stats.empathetic}</p>
                 </div>
                 <Heart className="w-8 h-8 text-pink-400" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-500/20 to-blue-500/20 border-purple-500/30">
+          <Card className="bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-500/20 dark:to-blue-500/20 border-purple-300 dark:border-purple-500/30">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">GitHub Repos</p>
-                  <p className="text-2xl font-bold text-white">{stats.github}</p>
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">{stats.github}</p>
                 </div>
                 <Github className="w-8 h-8 text-purple-400" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-green-500/30">
+          <Card className="bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-500/20 dark:to-emerald-500/20 border-green-300 dark:border-green-500/30">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Avg Duration</p>
-                  <p className="text-2xl font-bold text-white">{formatDuration(stats.avgDuration)}</p>
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">{formatDuration(stats.avgDuration)}</p>
                 </div>
                 <TrendingUp className="w-8 h-8 text-green-400" />
               </div>
@@ -149,22 +149,22 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
           <div className="flex items-center justify-center h-64">
             <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
           </div>
-        ) : logs.length === 0 ? (
+        ) : !logs || logs.length === 0 ? (
           <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
             <CardContent className="flex flex-col items-center justify-center py-16">
-              <Activity className="w-16 h-16 text-zinc-700 mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">No Reviews Yet</h3>
-              <p className="text-gray-400 text-center">
+              <Activity className="w-16 h-16 text-zinc-400 dark:text-zinc-700 mb-4" />
+              <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">No Reviews Yet</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-center">
                 Start reviewing code to see your activity logs here
               </p>
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-3">
-            {logs.map((log: any) => (
+            {logs?.map((log: any) => (
               <Card
                 key={log.id}
-                className="bg-zinc-900 border-zinc-800 hover:border-zinc-700 transition-all hover:shadow-lg"
+                className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all hover:shadow-lg"
               >
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
@@ -172,7 +172,7 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-2">
-                        <h3 className="font-semibold text-white text-sm">{log.session?.name || "Review"}</h3>
+                        <h3 className="font-semibold text-zinc-900 dark:text-white text-sm">{log.session?.name || "Review"}</h3>
                         <Badge className={getTypeBadge(log.session?.reviewType)}>
                           {log.session?.reviewType?.replace("_", " ") || "GENERAL"}
                         </Badge>
@@ -188,7 +188,7 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
                         )}
                       </div>
 
-                      <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-500 mb-3">
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {new Date(log.createdAt).toLocaleString()}
@@ -232,13 +232,13 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
 
       {/* Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-zinc-900 dark:text-white flex items-center gap-2">
               {selectedLog && getTypeIcon(selectedLog.reviewType)}
               Review Details
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-gray-600 dark:text-gray-400">
               {selectedLog?.title}
             </DialogDescription>
           </DialogHeader>
@@ -301,7 +301,7 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
                       {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     </Button>
                   </div>
-                  <div className="prose prose-invert prose-sm max-w-none bg-zinc-800/50 p-4 rounded-lg">
+                  <div className="prose dark:prose-invert prose-sm max-w-none bg-gray-50 dark:bg-zinc-800/50 p-4 rounded-lg">
                     <ReactMarkdown
                       components={{
                         code(props: any) {

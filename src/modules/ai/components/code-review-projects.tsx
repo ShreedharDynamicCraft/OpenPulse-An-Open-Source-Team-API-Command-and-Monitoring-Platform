@@ -73,11 +73,11 @@ export function CodeReviewProjects({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
             <FolderKanban className="w-6 h-6 text-indigo-500" />
             Code Review Projects
           </h2>
-          <p className="text-gray-400 mt-1">
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
             Organize your code reviews into projects and collections
           </p>
         </div>
@@ -92,7 +92,7 @@ export function CodeReviewProjects({
           <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
             <DialogHeader>
               <DialogTitle className="text-zinc-900 dark:text-white">Create New Project</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-gray-600 dark:text-gray-400">
                 Create a project to organize your code reviews
               </DialogDescription>
             </DialogHeader>
@@ -107,7 +107,7 @@ export function CodeReviewProjects({
                   placeholder="E.g., Frontend Refactoring, API Migration"
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
-                  className="bg-zinc-800 border-zinc-700 text-white"
+                  className="bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white"
                 />
               </div>
 
@@ -120,7 +120,7 @@ export function CodeReviewProjects({
                   placeholder="What is this project about?"
                   value={projectDescription}
                   onChange={(e) => setProjectDescription(e.target.value)}
-                  className="bg-zinc-800 border-zinc-700 text-white min-h-[100px]"
+                  className="bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white min-h-[100px]"
                 />
               </div>
 
@@ -156,10 +156,10 @@ export function CodeReviewProjects({
           {projects.map((project: any) => (
             <Card
               key={project.id}
-              className={`bg-zinc-900 border-2 transition-all cursor-pointer hover:scale-105 ${
+              className={`bg-white dark:bg-zinc-900 border-2 transition-all cursor-pointer hover:scale-105 ${
                 selectedProject === project.id
                   ? "border-indigo-500 shadow-lg shadow-indigo-500/20"
-                  : "border-zinc-800 hover:border-zinc-700"
+                  : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
               }`}
               onClick={() => onSelectProject(project.id === selectedProject ? null : project.id)}
             >
@@ -170,7 +170,7 @@ export function CodeReviewProjects({
                       <FolderKanban className="w-5 h-5 text-indigo-400 shrink-0" />
                       <span className="truncate">{project.name}</span>
                     </CardTitle>
-                    <CardDescription className="text-gray-400 mt-2 line-clamp-2">
+                    <CardDescription className="text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
                       {project.description || "No description"}
                     </CardDescription>
                   </div>
@@ -195,7 +195,7 @@ export function CodeReviewProjects({
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-zinc-800">
+                  <div className="flex items-center gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
                     <Button
                       size="sm"
                       variant="ghost"
@@ -218,9 +218,9 @@ export function CodeReviewProjects({
       ) : (
         <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <FolderKanban className="w-16 h-16 text-zinc-700 mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">No Projects Yet</h3>
-            <p className="text-gray-400 text-center mb-6 max-w-md">
+            <FolderKanban className="w-16 h-16 text-zinc-400 dark:text-zinc-700 mb-4" />
+            <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">No Projects Yet</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-center mb-6 max-w-md">
               Create your first project to organize your code reviews and keep track of your development work.
             </p>
             <Button

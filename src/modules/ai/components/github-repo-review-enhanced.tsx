@@ -193,7 +193,7 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
       </Card>
 
       {/* URL Input */}
-      <Card className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-2 border-purple-500/30">
+      <Card className="bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-500/10 dark:to-blue-500/10 border-2 border-purple-300 dark:border-purple-500/30">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -208,7 +208,7 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
               </div>
             </div>
             {selectedProject && (
-              <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
+              <Badge className="bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-500/30">
                 Project Selected
               </Badge>
             )}
@@ -221,7 +221,7 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
               placeholder="https://github.com/username/repository"
               value={repoUrl}
               onChange={(e) => setRepoUrl(e.target.value)}
-              className="flex-1 bg-zinc-800 border-zinc-700 text-white h-12 text-base"
+              className="flex-1 bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white h-12 text-base"
             />
             <Button
               onClick={handleFetchFiles}
@@ -240,7 +240,7 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
           </div>
 
           {/* Model Info */}
-          <div className="p-3 rounded-lg border-2 bg-blue-500/20 border-blue-500">
+          <div className="p-3 rounded-lg border-2 bg-blue-100 dark:bg-blue-500/20 border-blue-400 dark:border-blue-500">
             <p className="text-zinc-900 dark:text-white font-medium text-sm">🧠 Using: gemini-2.0-flash-exp</p>
           </div>
         </CardContent>
@@ -262,8 +262,8 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
                   key={file.path}
                   className={`flex items-start gap-3 p-3 rounded-lg border-2 transition-all cursor-pointer ${
                     selectedFiles.has(file.path)
-                      ? "bg-purple-500/10 border-purple-500"
-                      : "bg-zinc-800/50 border-zinc-700 hover:border-zinc-600"
+                      ? "bg-purple-100 dark:bg-purple-500/10 border-purple-400 dark:border-purple-500"
+                      : "bg-gray-50 dark:bg-zinc-800/50 border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600"
                   }`}
                   onClick={() => handleToggleFile(file.path)}
                 >
@@ -332,7 +332,7 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
             </div>
           </CardHeader>
           <CardContent>
-            <div className="prose dark:prose-invert prose-sm max-w-none bg-zinc-900/50 p-6 rounded-lg border border-zinc-700">
+            <div className="prose dark:prose-invert prose-sm max-w-none bg-gray-50 dark:bg-zinc-900/50 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
               <ReactMarkdown
                 components={{
                   code(props: any) {
@@ -353,9 +353,9 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
                       </code>
                     );
                   },
-                  h1: ({ children }) => <h1 className="text-2xl font-bold text-white mt-6 mb-4">{children}</h1>,
-                  h2: ({ children }) => <h2 className="text-xl font-bold text-white mt-5 mb-3">{children}</h2>,
-                  h3: ({ children }) => <h3 className="text-lg font-semibold text-white mt-4 mb-2">{children}</h3>,
+                  h1: ({ children }) => <h1 className="text-2xl font-bold text-zinc-900 dark:text-white mt-6 mb-4">{children}</h1>,
+                  h2: ({ children }) => <h2 className="text-xl font-bold text-zinc-900 dark:text-white mt-5 mb-3">{children}</h2>,
+                  h3: ({ children }) => <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mt-4 mb-2">{children}</h3>,
                   p: ({ children }) => <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">{children}</p>,
                   ul: ({ children }) => <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 mb-4">{children}</ul>,
                   ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 text-gray-700 dark:text-gray-300 mb-4">{children}</ol>,
