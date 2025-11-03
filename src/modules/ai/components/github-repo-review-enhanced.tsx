@@ -172,11 +172,11 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
   return (
     <div className="space-y-6">
       {/* Session Selector */}
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-white text-lg">Review Session</CardTitle>
+              <CardTitle className="text-zinc-900 dark:text-white text-lg">Review Session</CardTitle>
               <CardDescription>
                 Select an existing session or create a new one to track your reviews
               </CardDescription>
@@ -201,8 +201,8 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
                 <Github className="w-5 h-5 text-white" />
               </div>
               <div>
-                <CardTitle className="text-white text-xl">GitHub Repository Review</CardTitle>
-                <CardDescription className="text-gray-300">
+                <CardTitle className="text-zinc-900 dark:text-white text-xl">GitHub Repository Review</CardTitle>
+                <CardDescription className="text-gray-700 dark:text-gray-300">
                   Comprehensive analysis of your GitHub repository
                 </CardDescription>
               </div>
@@ -241,16 +241,16 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
 
           {/* Model Info */}
           <div className="p-3 rounded-lg border-2 bg-blue-500/20 border-blue-500">
-            <p className="text-white font-medium text-sm">🧠 Using: gemini-2.0-flash-exp</p>
+            <p className="text-zinc-900 dark:text-white font-medium text-sm">🧠 Using: gemini-2.0-flash-exp</p>
           </div>
         </CardContent>
       </Card>
 
       {/* File Selection */}
       {availableFiles.length > 0 && (
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
           <CardHeader>
-            <CardTitle className="text-white text-lg">Select Files to Review</CardTitle>
+            <CardTitle className="text-zinc-900 dark:text-white text-lg">Select Files to Review</CardTitle>
             <CardDescription>
               Choose up to 10 files ({selectedFiles.size}/10 selected)
             </CardDescription>
@@ -273,8 +273,8 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
                     className="mt-1"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">{file.name}</p>
-                    <p className="text-gray-400 text-xs truncate">{file.path}</p>
+                    <p className="text-zinc-900 dark:text-white text-sm font-medium truncate">{file.name}</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs truncate">{file.path}</p>
                     {file.language && (
                       <Badge variant="secondary" className="mt-1 text-xs">
                         {file.language}
@@ -318,13 +318,13 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-yellow-500 animate-pulse" />
-                <CardTitle className="text-white">✨ Repository Analysis Complete</CardTitle>
+                <CardTitle className="text-zinc-900 dark:text-white">✨ Repository Analysis Complete</CardTitle>
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleCopy}
-                className="bg-zinc-800 border-zinc-700"
+                className="bg-gray-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700"
               >
                 {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
                 {copied ? "Copied!" : "Copy"}
@@ -332,7 +332,7 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
             </div>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-invert prose-sm max-w-none bg-zinc-900/50 p-6 rounded-lg border border-zinc-700">
+            <div className="prose dark:prose-invert prose-sm max-w-none bg-zinc-900/50 p-6 rounded-lg border border-zinc-700">
               <ReactMarkdown
                 components={{
                   code(props: any) {
@@ -356,10 +356,10 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
                   h1: ({ children }) => <h1 className="text-2xl font-bold text-white mt-6 mb-4">{children}</h1>,
                   h2: ({ children }) => <h2 className="text-xl font-bold text-white mt-5 mb-3">{children}</h2>,
                   h3: ({ children }) => <h3 className="text-lg font-semibold text-white mt-4 mb-2">{children}</h3>,
-                  p: ({ children }) => <p className="text-gray-300 mb-4 leading-relaxed">{children}</p>,
-                  ul: ({ children }) => <ul className="list-disc list-inside space-y-2 text-gray-300 mb-4">{children}</ul>,
-                  ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 text-gray-300 mb-4">{children}</ol>,
-                  strong: ({ children }) => <strong className="text-white font-bold">{children}</strong>,
+                  p: ({ children }) => <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">{children}</p>,
+                  ul: ({ children }) => <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 mb-4">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 text-gray-700 dark:text-gray-300 mb-4">{children}</ol>,
+                  strong: ({ children }) => <strong className="text-zinc-900 dark:text-white font-bold">{children}</strong>,
                 }}
               >
                 {reviewRepo.data.content || ""}

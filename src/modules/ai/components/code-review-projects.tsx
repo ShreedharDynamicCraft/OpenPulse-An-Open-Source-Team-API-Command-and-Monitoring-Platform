@@ -89,9 +89,9 @@ export function CodeReviewProjects({
               New Project
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-zinc-900 border-zinc-800">
+          <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
             <DialogHeader>
-              <DialogTitle className="text-white">Create New Project</DialogTitle>
+              <DialogTitle className="text-zinc-900 dark:text-white">Create New Project</DialogTitle>
               <DialogDescription className="text-gray-400">
                 Create a project to organize your code reviews
               </DialogDescription>
@@ -99,7 +99,7 @@ export function CodeReviewProjects({
 
             <div className="space-y-4 mt-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-white">
+                <Label htmlFor="name" className="text-zinc-900 dark:text-white">
                   Project Name
                 </Label>
                 <Input
@@ -112,7 +112,7 @@ export function CodeReviewProjects({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-white">
+                <Label htmlFor="description" className="text-zinc-900 dark:text-white">
                   Description (Optional)
                 </Label>
                 <Textarea
@@ -166,7 +166,7 @@ export function CodeReviewProjects({
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="text-white text-lg flex items-center gap-2">
+                    <CardTitle className="text-zinc-900 dark:text-white text-lg flex items-center gap-2">
                       <FolderKanban className="w-5 h-5 text-indigo-400 shrink-0" />
                       <span className="truncate">{project.name}</span>
                     </CardTitle>
@@ -184,11 +184,11 @@ export function CodeReviewProjects({
                 <div className="space-y-3">
                   {/* Stats */}
                   <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-1 text-gray-400">
+                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                       <Code className="w-4 h-4" />
                       <span>{project._count?.reviews || 0} reviews</span>
                     </div>
-                    <div className="flex items-center gap-1 text-gray-400">
+                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                       <Clock className="w-4 h-4" />
                       <span>{new Date(project.createdAt).toLocaleDateString()}</span>
                     </div>
@@ -216,7 +216,7 @@ export function CodeReviewProjects({
           ))}
         </div>
       ) : (
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <FolderKanban className="w-16 h-16 text-zinc-700 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">No Projects Yet</h3>

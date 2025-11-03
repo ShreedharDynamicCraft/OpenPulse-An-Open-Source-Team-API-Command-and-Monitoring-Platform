@@ -181,11 +181,11 @@ export function EmpatheticCodeReviewEnhanced({
   return (
     <div className="space-y-6">
       {/* Session Selector */}
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-white text-lg">Review Session</CardTitle>
+              <CardTitle className="text-zinc-900 dark:text-white text-lg">Review Session</CardTitle>
               <CardDescription>
                 Select an existing session or create a new one to track your reviews
               </CardDescription>
@@ -202,7 +202,7 @@ export function EmpatheticCodeReviewEnhanced({
       </Card>
 
       {/* Configuration Panel */}
-      <Card className="bg-gradient-to-br from-pink-500/10 to-purple-500/10 border-2 border-pink-500/30">
+      <Card className="bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-500/10 dark:to-purple-500/10 border-2 border-pink-300 dark:border-pink-500/30">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -210,14 +210,14 @@ export function EmpatheticCodeReviewEnhanced({
                 <Heart className="w-5 h-5 text-white" />
               </div>
               <div>
-                <CardTitle className="text-white text-xl">Empathetic Code Review</CardTitle>
-                <CardDescription className="text-gray-300">
+                <CardTitle className="text-zinc-900 dark:text-white text-xl">Empathetic Code Review</CardTitle>
+                <CardDescription className="text-gray-700 dark:text-gray-300">
                   Transform harsh comments into constructive, educational feedback
                 </CardDescription>
               </div>
             </div>
             {selectedProject && (
-              <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
+              <Badge className="bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-500/30">
                 Project Selected
               </Badge>
             )}
@@ -228,11 +228,11 @@ export function EmpatheticCodeReviewEnhanced({
           {/* Language Selection */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-white text-sm font-semibold">Programming Language</Label>
+              <Label className="text-zinc-900 dark:text-white text-sm font-semibold">Programming Language</Label>
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="w-full px-4 py-2.5 bg-zinc-800/80 backdrop-blur border-2 border-zinc-700 rounded-lg text-white focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-all"
+                className="w-full px-4 py-2.5 bg-white dark:bg-zinc-800/80 backdrop-blur border-2 border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-all"
               >
                 {SUPPORTED_LANGUAGES.map((lang) => (
                   <option key={lang.value} value={lang.value}>
@@ -243,11 +243,11 @@ export function EmpatheticCodeReviewEnhanced({
             </div>
 
             <div className="space-y-2">
-              <Label className="text-white text-sm font-semibold">Review Tone</Label>
+              <Label className="text-zinc-900 dark:text-white text-sm font-semibold">Review Tone</Label>
               <select
                 value={tone}
                 onChange={(e) => setTone(e.target.value as any)}
-                className="w-full px-4 py-2.5 bg-zinc-800/80 backdrop-blur border-2 border-zinc-700 rounded-lg text-white focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-all"
+                className="w-full px-4 py-2.5 bg-white dark:bg-zinc-800/80 backdrop-blur border-2 border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-all"
               >
                 <option value="gentle">{toneDescriptions.gentle}</option>
                 <option value="balanced">{toneDescriptions.balanced}</option>
@@ -258,23 +258,23 @@ export function EmpatheticCodeReviewEnhanced({
 
           {/* AI Model Info */}
           <div className="space-y-2">
-            <Label className="text-white text-sm font-semibold">AI Model</Label>
-            <div className="p-4 rounded-lg border-2 bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20">
-              <p className="text-white font-medium mb-1">🧠 gemini-2.0-flash-exp</p>
-              <p className="text-xs text-gray-400">Detailed & Thorough - Comprehensive analysis with deeper insights</p>
+            <Label className="text-zinc-900 dark:text-white text-sm font-semibold">AI Model</Label>
+            <div className="p-4 rounded-lg border-2 bg-purple-100 dark:bg-purple-500/20 border-purple-400 dark:border-purple-500 shadow-lg shadow-purple-200 dark:shadow-purple-500/20">
+              <p className="text-zinc-900 dark:text-white font-medium mb-1">🧠 gemini-2.0-flash-exp</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Detailed & Thorough - Comprehensive analysis with deeper insights</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Code Input */}
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
         <CardHeader>
-          <CardTitle className="text-white text-lg">Code to Review</CardTitle>
+          <CardTitle className="text-zinc-900 dark:text-white text-lg">Code to Review</CardTitle>
           <CardDescription>Paste the code that needs review</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-lg overflow-hidden border-2 border-zinc-700 focus-within:border-pink-500 transition-all">
+          <div className="rounded-lg overflow-hidden border-2 border-zinc-300 dark:border-zinc-700 focus-within:border-pink-500 transition-all">
             <Editor
               height="300px"
               language={language}
@@ -295,7 +295,7 @@ export function EmpatheticCodeReviewEnhanced({
       </Card>
 
       {/* Comments Management */}
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white text-lg">Review Comments</CardTitle>
           <CardDescription>
@@ -316,7 +316,7 @@ export function EmpatheticCodeReviewEnhanced({
                   handleAddComment();
                 }
               }}
-              className="flex-1 bg-zinc-800 border-zinc-700 text-white min-h-[80px] placeholder:text-gray-500"
+              className="flex-1 bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white min-h-[80px] placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
             <Button
               onClick={handleAddComment}
@@ -330,11 +330,11 @@ export function EmpatheticCodeReviewEnhanced({
 
           {comments.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm text-gray-400">{comments.length} comment(s) added</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{comments.length} comment(s) added</p>
               {comments.map((comment, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-2 p-3 bg-zinc-800 rounded-lg border border-zinc-700"
+                  className="flex items-start gap-2 p-3 bg-gray-100 dark:bg-zinc-800 rounded-lg border border-zinc-300 dark:border-zinc-700"
                 >
                   <p className="flex-1 text-sm text-white">{comment}</p>
                   <Button
@@ -399,14 +399,14 @@ export function EmpatheticCodeReviewEnhanced({
                 <CardTitle className="text-white">✨ Empathetic Review Generated</CardTitle>
               </div>
               <div className="flex gap-2">
-                <Badge variant="secondary" className="bg-zinc-800">
+                <Badge variant="secondary" className="bg-gray-200 dark:bg-zinc-800">
                   {comments.length} comments reviewed
                 </Badge>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleCopy}
-                  className="bg-zinc-800 border-zinc-700"
+                  className="bg-gray-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700"
                 >
                   {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
                   {copied ? "Copied!" : "Copy"}
@@ -415,7 +415,7 @@ export function EmpatheticCodeReviewEnhanced({
             </div>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-invert prose-sm max-w-none bg-zinc-900/50 p-6 rounded-lg border border-zinc-700">
+            <div className="prose dark:prose-invert prose-sm max-w-none bg-gray-50 dark:bg-zinc-900/50 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
               <ReactMarkdown
                 components={{
                   code(props: any) {
@@ -439,12 +439,12 @@ export function EmpatheticCodeReviewEnhanced({
                   h1: ({ children }) => <h1 className="text-2xl font-bold text-white mt-6 mb-4">{children}</h1>,
                   h2: ({ children }) => <h2 className="text-xl font-bold text-white mt-5 mb-3">{children}</h2>,
                   h3: ({ children }) => <h3 className="text-lg font-semibold text-white mt-4 mb-2">{children}</h3>,
-                  p: ({ children }) => <p className="text-gray-300 mb-4 leading-relaxed">{children}</p>,
-                  ul: ({ children }) => <ul className="list-disc list-inside space-y-2 text-gray-300 mb-4">{children}</ul>,
-                  ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 text-gray-300 mb-4">{children}</ol>,
-                  li: ({ children }) => <li className="text-gray-300">{children}</li>,
+                  p: ({ children }) => <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">{children}</p>,
+                  ul: ({ children }) => <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 mb-4">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 text-gray-700 dark:text-gray-300 mb-4">{children}</ol>,
+                  li: ({ children }) => <li className="text-gray-700 dark:text-gray-300">{children}</li>,
                   blockquote: ({ children }) => (
-                    <blockquote className="border-l-4 border-pink-500 pl-4 italic text-gray-400 my-4">
+                    <blockquote className="border-l-4 border-pink-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
                       {children}
                     </blockquote>
                   ),

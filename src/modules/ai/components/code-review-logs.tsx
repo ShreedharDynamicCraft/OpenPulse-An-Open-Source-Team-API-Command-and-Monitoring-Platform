@@ -98,7 +98,7 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">Total Reviews</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Reviews</p>
                   <p className="text-2xl font-bold text-white">{stats.total}</p>
                 </div>
                 <Brain className="w-8 h-8 text-indigo-400" />
@@ -110,7 +110,7 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">Empathetic</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Empathetic</p>
                   <p className="text-2xl font-bold text-white">{stats.empathetic}</p>
                 </div>
                 <Heart className="w-8 h-8 text-pink-400" />
@@ -122,7 +122,7 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">GitHub Repos</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">GitHub Repos</p>
                   <p className="text-2xl font-bold text-white">{stats.github}</p>
                 </div>
                 <Github className="w-8 h-8 text-purple-400" />
@@ -134,7 +134,7 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">Avg Duration</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Avg Duration</p>
                   <p className="text-2xl font-bold text-white">{formatDuration(stats.avgDuration)}</p>
                 </div>
                 <TrendingUp className="w-8 h-8 text-green-400" />
@@ -150,7 +150,7 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
             <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
           </div>
         ) : logs.length === 0 ? (
-          <Card className="bg-zinc-900 border-zinc-800">
+          <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
             <CardContent className="flex flex-col items-center justify-center py-16">
               <Activity className="w-16 h-16 text-zinc-700 mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">No Reviews Yet</h3>
@@ -234,7 +234,7 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogContent className="bg-zinc-900 border-zinc-800 max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className="text-zinc-900 dark:text-white flex items-center gap-2">
               {selectedLog && getTypeIcon(selectedLog.reviewType)}
               Review Details
             </DialogTitle>
@@ -264,7 +264,7 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
               {/* Original Code */}
               {selectedLog.code && (
                 <div className="space-y-2">
-                  <Label className="text-white font-semibold">Original Code</Label>
+                  <Label className="text-zinc-900 dark:text-white font-semibold">Original Code</Label>
                   <div className="relative">
                     <Button
                       size="sm"
@@ -292,7 +292,7 @@ export function CodeReviewLogs({ workspaceId }: CodeReviewLogsProps) {
               {selectedLog.response && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label className="text-white font-semibold">AI Review</Label>
+                    <Label className="text-zinc-900 dark:text-white font-semibold">AI Review</Label>
                     <Button
                       size="sm"
                       variant="ghost"

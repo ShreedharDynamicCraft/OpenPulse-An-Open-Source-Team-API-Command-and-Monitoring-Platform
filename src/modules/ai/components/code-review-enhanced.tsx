@@ -35,7 +35,7 @@ export function CodeReviewModuleEnhanced({ workspaceId }: CodeReviewModuleProps)
       <ResizablePanel defaultSize={70} minSize={50}>
         <div className="w-full h-full flex flex-col">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
-            <div className="px-6 pt-6 pb-4 border-b border-zinc-800 bg-zinc-950">
+            <div className="px-6 pt-6 pb-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
@@ -43,22 +43,22 @@ export function CodeReviewModuleEnhanced({ workspaceId }: CodeReviewModuleProps)
                       <Code2 className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h1 className="text-3xl font-bold text-white">AI Code Review Studio</h1>
-                      <p className="text-gray-400 text-sm mt-1">
+                      <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">AI Code Review Studio</h1>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                         Professional code analysis powered by Gemini AI
                       </p>
                     </div>
                   </div>
                   {selectedProject && (
-                    <div className="flex items-center gap-2 px-4 py-2 bg-indigo-500/20 border border-indigo-500/30 rounded-lg">
-                      <FolderKanban className="w-4 h-4 text-indigo-400" />
-                      <span className="text-indigo-300 text-sm font-medium">{selectedProject}</span>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-indigo-100 dark:bg-indigo-500/20 border border-indigo-300 dark:border-indigo-500/30 rounded-lg">
+                      <FolderKanban className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      <span className="text-indigo-700 dark:text-indigo-300 text-sm font-medium">{selectedProject}</span>
                     </div>
                   )}
                 </div>
               </div>
               
-              <TabsList className="grid w-full max-w-2xl grid-cols-4 bg-zinc-800/50 backdrop-blur">
+              <TabsList className="grid w-full max-w-2xl grid-cols-4 bg-zinc-100 dark:bg-zinc-800/50 backdrop-blur">
                 <TabsTrigger
                   value="empathetic"
                   className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-600 data-[state=active]:to-purple-600 data-[state=active]:text-white"
@@ -123,11 +123,11 @@ export function CodeReviewModuleEnhanced({ workspaceId }: CodeReviewModuleProps)
         </div>
       </ResizablePanel>
 
-      <ResizableHandle withHandle className="bg-zinc-800 hover:bg-zinc-700" />
+      <ResizableHandle withHandle className="bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700" />
 
       {/* Right Sidebar - Chat */}
       <ResizablePanel defaultSize={30} minSize={25} maxSize={40}>
-        <div className="h-full border-l border-zinc-800 bg-zinc-950">
+        <div className="h-full border-l border-zinc-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950">
           <WorkspaceChat 
             workspaceId={workspaceId}
             currentUser={user ? {
