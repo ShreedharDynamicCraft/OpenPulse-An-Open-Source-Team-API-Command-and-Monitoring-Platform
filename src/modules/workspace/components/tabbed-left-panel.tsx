@@ -12,12 +12,13 @@ const TabbedLeftPanel = () => {
 
     const sidebarItems = [
         { icon: Home, label: "home", link: "/" },
-        { icon: MessageSquare, label: "chat", link: "/chat" },
         { icon: LinkIcon, label: "rest", link: "/rest" },
         { icon: Globe, label: "realtime", link: "/realtime" },
         { icon: Palette, label: "design", link: "/design" },
         { icon: FileCode, label: "code-editor", link: "/code-editor" },
         { icon: Code2, label: "code-review", link: "/code-review" },
+        { icon: MessageSquare, label: "chat", link: "/chat" },
+
     ];
 
     return (

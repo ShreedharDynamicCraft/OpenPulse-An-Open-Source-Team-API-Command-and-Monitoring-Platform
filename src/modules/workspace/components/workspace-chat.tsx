@@ -21,6 +21,13 @@ import {
   MoreVertical,
   Trash,
   Trash2,
+  Video,
+  VideoOff,
+  Monitor,
+  MonitorOff,
+  Maximize2,
+  Minimize2,
+  User,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -77,10 +84,19 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [showIncomingCall, setShowIncomingCall] = useState(false);
-  const [incomingCaller, setIncomingCaller] = useState<any>(null);
+  const [incomingCaller, setIncomingCaller] = useState<{
+    id: string;
+    name: string;
+    image?: string;
+    offer?: RTCSessionDescriptionInit;
+    callType?: "audio" | "video";
+  } | null>(null);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isChatVisible, setIsChatVisible] = useState(true);
+  const [isVideoCallExpanded, setIsVideoCallExpanded] = useState(false);
+  const [isVideoCallMinimized, setIsVideoCallMinimized] = useState(false);
+  const [videoCallSize, setVideoCallSize] = useState({ width: 400, height: 300 });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,12 +110,19 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
   const {
     isInCall,
     isMuted,
+    isVideoEnabled,
+    isScreenSharing,
     isConnecting,
+    callType,
     callParticipants,
     startCall,
     answerCall,
     endCall,
+    cancelCall,
     toggleMute,
+    toggleVideo,
+    startScreenShare,
+    stopScreenShare,
     handleCallSignal,
   } = useVoiceCall({
     workspaceId,
@@ -242,9 +265,15 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
     
     // Handle call signals using ref to avoid infinite loop
     if (latestMessage.type === "call_signal" && latestMessage.data) {
+      // Handle call cancellation specifically
+      if (latestMessage.data.type === "call-cancelled" && showIncomingCall) {
+        stopRingtone();
+        setShowIncomingCall(false);
+        setIncomingCaller(null);
+      }
       handleCallSignalRef.current(latestMessage.data);
     }
-  }, [broadcastMessages, currentUser?.id, isChatVisible]);
+  }, [broadcastMessages, currentUser?.id, isChatVisible, showIncomingCall]);
 
   // Reset unread count when chat becomes visible
   useEffect(() => {
@@ -605,27 +634,46 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="w-56">
                   {teamMembers.length > 0 ? (
                     teamMembers.map((member) => (
-                      <DropdownMenuItem
-                        key={member.id}
-                        onClick={() =>
-                          startCall({
-                            id: member.id,
-                            name: member.name,
-                            image: member.image,
-                          })
-                        }
-                      >
-                        <Avatar className="w-6 h-6 mr-2">
-                          <AvatarImage src={member.image} />
-                          <AvatarFallback className="text-xs">
-                            {member.name.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        {member.name}
-                      </DropdownMenuItem>
+                      <div key={member.id} className="space-y-1">
+                        <div className="flex items-center px-2 py-1.5 text-sm font-medium text-muted-foreground">
+                          <Avatar className="w-6 h-6 mr-2">
+                            <AvatarImage src={member.image} />
+                            <AvatarFallback className="text-xs">
+                              {member.name.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          {member.name}
+                        </div>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            startCall({
+                              id: member.id,
+                              name: member.name,
+                              image: member.image,
+                            }, "audio")
+                          }
+                          className="pl-10"
+                        >
+                          <Phone className="w-4 h-4 mr-2" />
+                          Audio Call
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            startCall({
+                              id: member.id,
+                              name: member.name,
+                              image: member.image,
+                            }, "video")
+                          }
+                          className="pl-10"
+                        >
+                          <Video className="w-4 h-4 mr-2" />
+                          Video Call
+                        </DropdownMenuItem>
+                      </div>
                     ))
                   ) : (
                     <DropdownMenuItem disabled>
@@ -665,6 +713,7 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
           </div>
           
           <div className="flex items-center gap-2">
+            {/* Mute Button */}
             <Button
               variant={isMuted ? "destructive" : "secondary"}
               size="sm"
@@ -686,6 +735,80 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
                 </>
               )}
             </Button>
+
+            {/* Video Toggle Button - Only for video calls */}
+            {callType === "video" && (
+              <Button
+                variant={isVideoEnabled ? "secondary" : "destructive"}
+                size="sm"
+                onClick={toggleVideo}
+                className={cn(
+                  "gap-2",
+                  isVideoEnabled ? "bg-white/90 hover:bg-white text-green-600" : "bg-red-600 hover:bg-red-700 text-white"
+                )}
+              >
+                {isVideoEnabled ? (
+                  <>
+                    <Video className="w-4 h-4" />
+                    Camera On
+                  </>
+                ) : (
+                  <>
+                    <VideoOff className="w-4 h-4" />
+                    Camera Off
+                  </>
+                )}
+              </Button>
+            )}
+
+            {/* Screen Share Button - Only for video calls */}
+            {callType === "video" && (
+              <Button
+                variant={isScreenSharing ? "destructive" : "secondary"}
+                size="sm"
+                onClick={isScreenSharing ? stopScreenShare : startScreenShare}
+                className={cn(
+                  "gap-2",
+                  isScreenSharing ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-white/90 hover:bg-white text-green-600"
+                )}
+              >
+                {isScreenSharing ? (
+                  <>
+                    <MonitorOff className="w-4 h-4" />
+                    Stop Sharing
+                  </>
+                ) : (
+                  <>
+                    <Monitor className="w-4 h-4" />
+                    Share Screen
+                  </>
+                )}
+              </Button>
+            )}
+
+            {/* Expand/Collapse Video - Only for video calls */}
+            {callType === "video" && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsVideoCallExpanded(!isVideoCallExpanded)}
+                className="gap-2 bg-white/90 hover:bg-white text-green-600"
+              >
+                {isVideoCallExpanded ? (
+                  <>
+                    <Minimize2 className="w-4 h-4" />
+                    Minimize
+                  </>
+                ) : (
+                  <>
+                    <Maximize2 className="w-4 h-4" />
+                    Expand
+                  </>
+                )}
+              </Button>
+            )}
+
+            {/* End Call Button */}
             <Button 
               variant="destructive" 
               size="sm" 
@@ -795,7 +918,244 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
         </p>
       </div>
 
-      {/* Hidden audio element for remote audio */}
+      {/* Video Call UI - Only shown for video calls */}
+      {(isInCall || isConnecting) && callType === "video" && !isVideoCallMinimized && (
+        <div 
+          className={cn(
+            "fixed transition-all duration-300 bg-black/95 backdrop-blur-sm",
+            isVideoCallExpanded 
+              ? "inset-0 z-50" 
+              : "bottom-4 right-4 rounded-xl overflow-hidden shadow-2xl border border-gray-700 z-40"
+          )}
+          style={!isVideoCallExpanded ? { 
+            width: `${videoCallSize.width}px`, 
+            height: `${videoCallSize.height}px`,
+            minWidth: '320px',
+            minHeight: '240px',
+            maxWidth: 'calc(100vw - 320px)', // Leave space for sidebar
+            maxHeight: 'calc(100vh - 100px)'
+          } : undefined}
+        >
+          {/* Video Call Header */}
+          <div className="absolute top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent p-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 text-white">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-sm font-semibold">
+                    {callParticipants[0]?.name || "Unknown"}
+                  </span>
+                </div>
+                {isScreenSharing && (
+                  <div className="flex items-center gap-1.5 bg-blue-600/90 px-2 py-1 rounded-md">
+                    <Monitor className="w-3 h-3 text-white" />
+                    <span className="text-xs text-white font-medium">Screen Sharing</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                {!isVideoCallExpanded && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 w-7 p-0 hover:bg-white/20 text-white"
+                    onClick={() => setIsVideoCallMinimized(true)}
+                    title="Minimize"
+                  >
+                    <Minimize2 className="w-4 h-4" />
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 w-7 p-0 hover:bg-white/20 text-white"
+                  onClick={() => setIsVideoCallExpanded(!isVideoCallExpanded)}
+                  title={isVideoCallExpanded ? "Exit Fullscreen" : "Fullscreen"}
+                >
+                  {isVideoCallExpanded ? (
+                    <Minimize2 className="w-4 h-4" />
+                  ) : (
+                    <Maximize2 className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Remote Video (main video) */}
+          <div className="relative w-full h-full bg-gray-900">
+            <video 
+              id="remote-video"
+              autoPlay
+              playsInline
+              className="w-full h-full object-contain"
+            />
+            
+            {/* No video indicator */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="text-center">
+                <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center mx-auto mb-3">
+                  <User className="w-10 h-10 text-gray-400" />
+                </div>
+                <p className="text-sm text-gray-400">
+                  {isConnecting ? "Connecting..." : "Waiting for video..."}
+                </p>
+                {isConnecting && (
+                  <Loader2 className="w-6 h-6 text-blue-400 animate-spin mx-auto mt-2" />
+                )}
+              </div>
+            </div>
+          </div>
+          
+          {/* Local Video (picture-in-picture) */}
+          <div className={cn(
+            "absolute bg-gray-800 rounded-lg overflow-hidden shadow-xl border-2 border-white/20 transition-all",
+            isVideoCallExpanded
+              ? "bottom-20 right-6 w-64 h-48"
+              : "bottom-16 right-3 w-32 h-24"
+          )}>
+            <video 
+              id="local-video"
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover mirror"
+            />
+            {!isVideoEnabled && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
+                <VideoOff className="w-6 h-6 text-white" />
+              </div>
+            )}
+            <div className="absolute bottom-1 left-1 right-1 text-center">
+              <span className="text-[10px] text-white/80 font-medium bg-black/50 px-1.5 py-0.5 rounded">
+                You
+              </span>
+            </div>
+          </div>
+
+          {/* Video Controls */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+            <div className="flex items-center justify-center gap-3">
+              <Button
+                size={isVideoCallExpanded ? "default" : "sm"}
+                variant={isMuted ? "destructive" : "secondary"}
+                className={cn(
+                  "rounded-full transition-all",
+                  isVideoCallExpanded ? "h-12 w-12" : "h-10 w-10"
+                )}
+                onClick={toggleMute}
+                title={isMuted ? "Unmute" : "Mute"}
+              >
+                {isMuted ? (
+                  <MicOff className={isVideoCallExpanded ? "w-5 h-5" : "w-4 h-4"} />
+                ) : (
+                  <Mic className={isVideoCallExpanded ? "w-5 h-5" : "w-4 h-4"} />
+                )}
+              </Button>
+
+              <Button
+                size={isVideoCallExpanded ? "default" : "sm"}
+                variant={isVideoEnabled ? "secondary" : "destructive"}
+                className={cn(
+                  "rounded-full transition-all",
+                  isVideoCallExpanded ? "h-12 w-12" : "h-10 w-10"
+                )}
+                onClick={toggleVideo}
+                title={isVideoEnabled ? "Turn Off Camera" : "Turn On Camera"}
+              >
+                {isVideoEnabled ? (
+                  <Video className={isVideoCallExpanded ? "w-5 h-5" : "w-4 h-4"} />
+                ) : (
+                  <VideoOff className={isVideoCallExpanded ? "w-5 h-5" : "w-4 h-4"} />
+                )}
+              </Button>
+
+              <Button
+                size={isVideoCallExpanded ? "default" : "sm"}
+                variant={isScreenSharing ? "default" : "secondary"}
+                className={cn(
+                  "rounded-full transition-all",
+                  isVideoCallExpanded ? "h-12 w-12" : "h-10 w-10"
+                )}
+                onClick={isScreenSharing ? stopScreenShare : startScreenShare}
+                title={isScreenSharing ? "Stop Sharing" : "Share Screen"}
+              >
+                <Monitor className={isVideoCallExpanded ? "w-5 h-5" : "w-4 h-4"} />
+              </Button>
+
+              <Button
+                size={isVideoCallExpanded ? "default" : "sm"}
+                variant="destructive"
+                className={cn(
+                  "rounded-full transition-all",
+                  isVideoCallExpanded ? "h-12 w-12" : "h-10 w-10"
+                )}
+                onClick={() => {
+                  endCall();
+                  setIsVideoCallExpanded(false);
+                  setIsVideoCallMinimized(false);
+                }}
+                title="End Call"
+              >
+                <PhoneOff className={isVideoCallExpanded ? "w-5 h-5" : "w-4 h-4"} />
+              </Button>
+            </div>
+          </div>
+
+          {/* Resize Handle (only in windowed mode) */}
+          {!isVideoCallExpanded && (
+            <div
+              className="absolute bottom-0 right-0 w-6 h-6 cursor-nwse-resize group"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startWidth = videoCallSize.width;
+                const startHeight = videoCallSize.height;
+
+                const handleMouseMove = (e: MouseEvent) => {
+                  const deltaX = e.clientX - startX;
+                  const deltaY = e.clientY - startY;
+                  setVideoCallSize({
+                    width: Math.max(320, Math.min(startWidth + deltaX, window.innerWidth - 320)),
+                    height: Math.max(240, Math.min(startHeight + deltaY, window.innerHeight - 100))
+                  });
+                };
+
+                const handleMouseUp = () => {
+                  document.removeEventListener('mousemove', handleMouseMove);
+                  document.removeEventListener('mouseup', handleMouseUp);
+                };
+
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+              }}
+            >
+              <div className="absolute bottom-1 right-1 w-4 h-4 border-r-2 border-b-2 border-gray-400 group-hover:border-white transition-colors" />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Minimized Video Call Bar */}
+      {(isInCall || isConnecting) && callType === "video" && isVideoCallMinimized && (
+        <div className="fixed bottom-4 right-4 z-40">
+          <Button
+            size="lg"
+            className="rounded-full shadow-2xl bg-blue-600 hover:bg-blue-700 text-white px-6 gap-3"
+            onClick={() => setIsVideoCallMinimized(false)}
+          >
+            <Video className="w-5 h-5" />
+            <span className="font-medium">
+              {isConnecting ? "Calling" : "Video Call with"} {callParticipants[0]?.name}
+            </span>
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+          </Button>
+        </div>
+      )}
+
+      {/* Hidden audio element for remote audio (for audio-only calls) */}
       <audio id="remote-audio" autoPlay />
 
       {/* Ringtone audio element */}
@@ -805,20 +1165,92 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
         preload="auto"
       />
 
+      {/* Outgoing Call Dialog - Calling... */}
+      {isConnecting && !isInCall && !showIncomingCall && callParticipants.length > 0 && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+          <Card className="p-6 max-w-sm w-full mx-4 shadow-2xl">
+            <div className="text-center">
+              {/* Target User Avatar */}
+              {callParticipants[0].image ? (
+                <Avatar className="w-24 h-24 mx-auto mb-4 ring-4 ring-blue-500 ring-offset-2">
+                  <AvatarImage src={callParticipants[0].image} />
+                  <AvatarFallback className="text-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+                    {callParticipants[0].name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 shadow-lg relative">
+                  {/* Pulsing rings animation */}
+                  <div className="absolute inset-0 rounded-full bg-blue-400 animate-ping opacity-75"></div>
+                  <div className="absolute inset-0 rounded-full bg-blue-400 animate-ping opacity-50 animation-delay-150"></div>
+                  {callType === "video" ? (
+                    <Video className="w-12 h-12 text-white animate-pulse relative z-10" />
+                  ) : (
+                    <Phone className="w-12 h-12 text-white animate-pulse relative z-10" />
+                  )}
+                </div>
+              )}
+              <h3 className="text-xl font-semibold mb-2">
+                {callType === "video" ? "📹 Video Calling..." : "📞 Calling..."}
+              </h3>
+              <p className="text-muted-foreground mb-2 text-lg font-medium">
+                {callParticipants[0].name}
+              </p>
+              <p className="text-sm text-muted-foreground mb-6">
+                Waiting for {callParticipants[0].name} to answer...
+              </p>
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                <span className="text-sm text-muted-foreground">Connecting...</span>
+              </div>
+              <Button
+                variant="destructive"
+                className="w-full"
+                onClick={() => {
+                  cancelCall();
+                }}
+              >
+                <PhoneOff className="w-4 h-4 mr-2" />
+                Cancel Call
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
       {/* Incoming Call Dialog */}
       {showIncomingCall && incomingCaller && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
           <Card className="p-6 max-w-sm w-full mx-4 shadow-2xl animate-bounce-slow">
             <div className="text-center">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mx-auto mb-4 shadow-lg relative">
-                {/* Pulsing rings animation */}
-                <div className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-75"></div>
-                <div className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-50 animation-delay-150"></div>
-                <Phone className="w-12 h-12 text-white animate-pulse relative z-10" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">📞 Incoming Call</h3>
-              <p className="text-muted-foreground mb-6 text-lg font-medium">
-                {incomingCaller.name} is calling...
+              {/* Caller Avatar */}
+              {incomingCaller.image ? (
+                <Avatar className="w-24 h-24 mx-auto mb-4 ring-4 ring-green-500 ring-offset-2">
+                  <AvatarImage src={incomingCaller.image} />
+                  <AvatarFallback className="text-2xl bg-gradient-to-br from-green-500 to-emerald-600 text-white">
+                    {incomingCaller.name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mx-auto mb-4 shadow-lg relative">
+                  {/* Pulsing rings animation */}
+                  <div className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-75"></div>
+                  <div className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-50 animation-delay-150"></div>
+                  {incomingCaller.callType === "video" ? (
+                    <Video className="w-12 h-12 text-white animate-pulse relative z-10" />
+                  ) : (
+                    <Phone className="w-12 h-12 text-white animate-pulse relative z-10" />
+                  )}
+                </div>
+              )}
+              <h3 className="text-xl font-semibold mb-2">
+                {incomingCaller.callType === "video" ? "📹 Incoming Video Call" : "📞 Incoming Call"}
+              </h3>
+              <p className="text-muted-foreground mb-2 text-lg font-medium">
+                {incomingCaller.name}
+              </p>
+              <p className="text-sm text-muted-foreground mb-6">
+                {incomingCaller.callType === "video" ? "wants to video call you" : "is calling you"}
               </p>
               <div className="flex gap-3">
                 <Button
@@ -837,7 +1269,9 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
                   className="flex-1 bg-green-600 hover:bg-green-700"
                   onClick={() => {
                     stopRingtone();
-                    answerCall(incomingCaller.offer, incomingCaller);
+                    if (incomingCaller.offer) {
+                      answerCall(incomingCaller.offer as RTCSessionDescriptionInit, incomingCaller);
+                    }
                     setShowIncomingCall(false);
                   }}
                 >

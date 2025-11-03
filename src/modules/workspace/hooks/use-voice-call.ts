@@ -3,11 +3,14 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
+export type CallType = "audio" | "video";
+
 interface CallUser {
   id: string;
   name: string;
   image?: string;
   offer?: RTCSessionDescriptionInit;
+  callType?: CallType;
 }
 
 interface UseVoiceCallProps {
@@ -27,12 +30,16 @@ export function useVoiceCall({
 }: UseVoiceCallProps) {
   const [isInCall, setIsInCall] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [isVideoEnabled, setIsVideoEnabled] = useState(false);
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const [callType, setCallType] = useState<CallType>("audio");
   const [callParticipants, setCallParticipants] = useState<CallUser[]>([]);
   const [isConnecting, setIsConnecting] = useState(false);
 
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
   const remoteStreamRef = useRef<MediaStream | null>(null);
+  const screenStreamRef = useRef<MediaStream | null>(null);
   const pendingIceCandidatesRef = useRef<RTCIceCandidateInit[]>([]);
 
   // Initialize WebRTC
@@ -59,19 +66,57 @@ export function useVoiceCall({
 
     // Handle incoming stream
     pc.ontrack = (event) => {
+      console.log("Received remote track:", event.track.kind);
       remoteStreamRef.current = event.streams[0];
+      
       // Play remote audio
       const audioElement = document.getElementById(
         "remote-audio"
       ) as HTMLAudioElement;
       if (audioElement) {
         audioElement.srcObject = event.streams[0];
+        audioElement.play().catch(err => {
+          // Ignore AbortError as it's expected when stream changes
+          if (err.name !== 'AbortError') {
+            console.error("Error playing remote audio:", err);
+          }
+        });
+      }
+
+      // Play remote video if available
+      if (event.streams[0].getVideoTracks().length > 0) {
+        setTimeout(async () => {
+          const videoElement = document.getElementById(
+            "remote-video"
+          ) as HTMLVideoElement;
+          if (videoElement) {
+            try {
+              // Only set srcObject if it's different to avoid interruptions
+              if (videoElement.srcObject !== event.streams[0]) {
+                videoElement.srcObject = event.streams[0];
+              }
+              // Wait for the video to be ready before playing
+              if (videoElement.paused) {
+                await videoElement.play();
+              }
+              console.log("Remote video stream set successfully");
+            } catch (err: any) {
+              // Ignore AbortError as it's expected when stream changes
+              if (err.name !== 'AbortError') {
+                console.error("Error playing remote video:", err);
+              }
+            }
+          }
+        }, 200);
       }
     };
 
     // Handle connection state
     pc.onconnectionstatechange = () => {
-      console.log("Connection state:", pc.connectionState);
+      console.log("WebRTC Connection state:", pc.connectionState);
+      console.log("ICE Connection state:", pc.iceConnectionState);
+      console.log("Signaling state:", pc.signalingState);
+      
       if (pc.connectionState === "connected") {
         setIsConnecting(false);
         setIsInCall(true);
@@ -93,16 +138,52 @@ export function useVoiceCall({
 
   // Start a call
   const startCall = useCallback(
-    async (targetUser: CallUser) => {
+    async (targetUser: CallUser, type: CallType = "audio") => {
       try {
         setIsConnecting(true);
+        setCallType(type);
 
-        // Get local audio stream
+        // Get local media stream
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: true,
-          video: false,
+          video: type === "video" ? {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: "user"
+          } : false,
         });
         localStreamRef.current = stream;
+
+        console.log("Local stream obtained:", {
+          audio: stream.getAudioTracks().length,
+          video: stream.getVideoTracks().length
+        });
+
+        // Show local video if video call
+        if (type === "video") {
+          setIsVideoEnabled(true);
+          // Use setTimeout to ensure video element is rendered
+          setTimeout(async () => {
+            const localVideoElement = document.getElementById(
+              "local-video"
+            ) as HTMLVideoElement;
+            if (localVideoElement && stream) {
+              try {
+                localVideoElement.srcObject = stream;
+                // Wait for the video to be ready before playing
+                await localVideoElement.play();
+                console.log("Local video element initialized successfully");
+              } catch (err: any) {
+                // Ignore AbortError as it's expected when stream changes
+                if (err.name !== 'AbortError') {
+                  console.error("Error playing local video:", err);
+                }
+              }
+            } else {
+              console.error("Local video element not found!");
+            }
+          }, 300);
+        }
 
         // Initialize peer connection
         const pc = initializePeerConnection();
@@ -123,38 +204,125 @@ export function useVoiceCall({
           userId: currentUserId,
           targetUserId: targetUser.id,
           callerName: currentUserName || "Unknown User",
+          callType: type,
           workspaceId,
         });
 
         setCallParticipants([targetUser]);
-        toast.info(`📞 Calling ${targetUser.name}...`);
+        const callIcon = type === "video" ? "📹" : "📞";
+        toast.info(`${callIcon} Calling ${targetUser.name}...`);
       } catch (error) {
         console.error("Failed to start call:", error);
-        toast.error("Failed to start call. Please check microphone permissions.");
+        toast.error("Failed to start call. Please check microphone/camera permissions.");
         setIsConnecting(false);
+        
+        // Clean up if failed
+        if (localStreamRef.current) {
+          localStreamRef.current.getTracks().forEach((track) => track.stop());
+          localStreamRef.current = null;
+        }
       }
     },
-    [initializePeerConnection, broadcastSignal, workspaceId]
+    [initializePeerConnection, broadcastSignal, workspaceId, currentUserId, currentUserName]
   );
+
+  // Cancel outgoing call
+  const cancelCall = useCallback(() => {
+    if (!isConnecting) return;
+
+    // Stop local tracks
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => track.stop());
+      localStreamRef.current = null;
+    }
+
+    // Close peer connection
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+
+    // Clear video elements
+    const localVideo = document.getElementById("local-video") as HTMLVideoElement;
+    if (localVideo) localVideo.srcObject = null;
+
+    // Broadcast call cancelled
+    const targetUserId = callParticipants[0]?.id;
+    if (targetUserId) {
+      broadcastSignal("call_signal", {
+        type: "call-cancelled",
+        userId: currentUserId,
+        targetUserId,
+        workspaceId,
+      });
+    }
+
+    setIsConnecting(false);
+    setCallParticipants([]);
+    setIsMuted(false);
+    setIsVideoEnabled(false);
+    setCallType("audio");
+    pendingIceCandidatesRef.current = [];
+
+    toast.info("📞 Call cancelled");
+  }, [isConnecting, callParticipants, broadcastSignal, workspaceId, currentUserId]);
 
   // Answer a call
   const answerCall = useCallback(
     async (offer: RTCSessionDescriptionInit, caller: CallUser) => {
       try {
         setIsConnecting(true);
+        const type = caller.callType || "audio";
+        setCallType(type);
 
-        // Get local audio stream
+        // Get local media stream
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: true,
-          video: false,
+          video: type === "video" ? {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: "user"
+          } : false,
         });
         localStreamRef.current = stream;
+
+        console.log("Local stream obtained (answer):", {
+          audio: stream.getAudioTracks().length,
+          video: stream.getVideoTracks().length
+        });
+
+        // Show local video if video call
+        if (type === "video") {
+          setIsVideoEnabled(true);
+          // Use setTimeout to ensure video element is rendered
+          setTimeout(async () => {
+            const localVideoElement = document.getElementById(
+              "local-video"
+            ) as HTMLVideoElement;
+            if (localVideoElement && stream) {
+              try {
+                localVideoElement.srcObject = stream;
+                // Wait for the video to be ready before playing
+                await localVideoElement.play();
+                console.log("Local video element initialized successfully (answer)");
+              } catch (err: any) {
+                // Ignore AbortError as it's expected when stream changes
+                if (err.name !== 'AbortError') {
+                  console.error("Error playing local video:", err);
+                }
+              }
+            } else {
+              console.error("Local video element not found!");
+            }
+          }, 300);
+        }
 
         // Initialize peer connection
         const pc = initializePeerConnection();
 
         // Add local tracks
         stream.getTracks().forEach((track) => {
+          console.log("Adding local track to peer connection:", track.kind);
           pc.addTrack(track, stream);
         });
 
@@ -214,6 +382,7 @@ export function useVoiceCall({
                   name: signal.callerName || "Unknown",
                   image: signal.callerImage,
                   offer: signal.offer,
+                  callType: signal.callType || "audio",
                 });
               }
             }
@@ -255,6 +424,14 @@ export function useVoiceCall({
             }
             break;
 
+          case "call-cancelled":
+            // Handle incoming call being cancelled by caller
+            if (signal.targetUserId === currentUserId && (isConnecting || !isInCall)) {
+              toast.info("📞 Call was cancelled");
+              // If we have an incoming call modal, it will be handled by the component
+            }
+            break;
+
           case "call-ended":
             if (isInCall || isConnecting) {
               toast.info("📞 The other person ended the call");
@@ -280,6 +457,12 @@ export function useVoiceCall({
     // Clear pending ICE candidates
     pendingIceCandidatesRef.current = [];
     
+    // Stop screen sharing if active
+    if (screenStreamRef.current) {
+      screenStreamRef.current.getTracks().forEach((track) => track.stop());
+      screenStreamRef.current = null;
+    }
+    
     // Stop local tracks
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((track) => track.stop());
@@ -291,6 +474,12 @@ export function useVoiceCall({
       peerConnectionRef.current.close();
       peerConnectionRef.current = null;
     }
+
+    // Clear video elements
+    const localVideo = document.getElementById("local-video") as HTMLVideoElement;
+    const remoteVideo = document.getElementById("remote-video") as HTMLVideoElement;
+    if (localVideo) localVideo.srcObject = null;
+    if (remoteVideo) remoteVideo.srcObject = null;
 
     // Broadcast call ended
     if (wasInCall) {
@@ -304,6 +493,9 @@ export function useVoiceCall({
     setIsConnecting(false);
     setCallParticipants([]);
     setIsMuted(false);
+    setIsVideoEnabled(false);
+    setIsScreenSharing(false);
+    setCallType("audio");
 
     if (wasInCall) {
       toast.info("📞 Call ended");
@@ -328,6 +520,131 @@ export function useVoiceCall({
     }
   }, []);
 
+  // Toggle video
+  const toggleVideo = useCallback(async () => {
+    if (!localStreamRef.current || callType !== "video") return;
+
+    try {
+      const videoTrack = localStreamRef.current.getVideoTracks()[0];
+      
+      if (videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        const newVideoState = videoTrack.enabled;
+        setIsVideoEnabled(newVideoState);
+        
+        if (newVideoState) {
+          toast.success("📹 Camera enabled");
+        } else {
+          toast.info("📷 Camera disabled");
+        }
+      }
+    } catch (error) {
+      console.error("Failed to toggle video:", error);
+      toast.error("Failed to toggle camera");
+    }
+  }, [callType]);
+
+  // Start screen sharing
+  const startScreenShare = useCallback(async () => {
+    if (!peerConnectionRef.current || !isInCall) return;
+
+    try {
+      // Get screen stream
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({
+        video: {
+          cursor: "always",
+        } as MediaTrackConstraints,
+        audio: false,
+      });
+
+      screenStreamRef.current = screenStream;
+      
+      // Replace video track with screen track
+      const screenTrack = screenStream.getVideoTracks()[0];
+      const pc = peerConnectionRef.current;
+      const senders = pc.getSenders();
+      const videoSender = senders.find((sender) => 
+        sender.track?.kind === "video"
+      );
+
+      if (videoSender) {
+        await videoSender.replaceTrack(screenTrack);
+      } else {
+        pc.addTrack(screenTrack, screenStream);
+      }
+
+      // Update local video element
+      const localVideoElement = document.getElementById(
+        "local-video"
+      ) as HTMLVideoElement;
+      if (localVideoElement) {
+        localVideoElement.srcObject = screenStream;
+      }
+
+      setIsScreenSharing(true);
+      toast.success("🖥️ Screen sharing started");
+
+      // Listen for when user stops sharing
+      screenTrack.onended = () => {
+        stopScreenShare();
+      };
+    } catch (error) {
+      console.error("Failed to start screen sharing:", error);
+      toast.error("Failed to start screen sharing");
+    }
+  }, [isInCall]);
+
+  // Stop screen sharing
+  const stopScreenShare = useCallback(async () => {
+    if (!screenStreamRef.current || !peerConnectionRef.current) return;
+
+    try {
+      // Stop screen stream
+      screenStreamRef.current.getTracks().forEach((track) => track.stop());
+      screenStreamRef.current = null;
+
+      // Switch back to camera if video was enabled
+      if (localStreamRef.current && callType === "video") {
+        const cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+
+        const cameraTrack = cameraStream.getVideoTracks()[0];
+        const pc = peerConnectionRef.current;
+        const senders = pc.getSenders();
+        const videoSender = senders.find((sender) => 
+          sender.track?.kind === "video"
+        );
+
+        if (videoSender) {
+          await videoSender.replaceTrack(cameraTrack);
+        }
+
+        // Update local video stream
+        const oldVideoTrack = localStreamRef.current.getVideoTracks()[0];
+        if (oldVideoTrack) {
+          localStreamRef.current.removeTrack(oldVideoTrack);
+        }
+        localStreamRef.current.addTrack(cameraTrack);
+
+        // Update local video element
+        const localVideoElement = document.getElementById(
+          "local-video"
+        ) as HTMLVideoElement;
+        if (localVideoElement) {
+          localVideoElement.srcObject = localStreamRef.current;
+        }
+      }
+
+      setIsScreenSharing(false);
+      toast.info("🖥️ Screen sharing stopped");
+    } catch (error) {
+      console.error("Failed to stop screen sharing:", error);
+      toast.error("Failed to stop screen sharing");
+    }
+  }, [callType]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -340,12 +657,19 @@ export function useVoiceCall({
   return {
     isInCall,
     isMuted,
+    isVideoEnabled,
+    isScreenSharing,
     isConnecting,
+    callType,
     callParticipants,
     startCall,
     answerCall,
     endCall,
+    cancelCall,
     toggleMute,
+    toggleVideo,
+    startScreenShare,
+    stopScreenShare,
     handleCallSignal,
   };
 }

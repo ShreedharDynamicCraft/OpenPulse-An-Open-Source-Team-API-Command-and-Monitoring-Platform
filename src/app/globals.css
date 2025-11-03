@@ -244,3 +244,17 @@
     background-position: 0% 50%;
   }
 }
+
+/* Video call styles */
+.mirror {
+  transform: scaleX(-1);
+}
+
+video {
+  object-fit: cover;
+}
+
+/* Animation delay for call rings */
+.animation-delay-150 {
+  animation-delay: 150ms;
+}

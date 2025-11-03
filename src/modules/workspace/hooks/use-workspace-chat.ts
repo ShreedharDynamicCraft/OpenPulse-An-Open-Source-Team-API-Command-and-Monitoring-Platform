@@ -127,11 +127,25 @@ export function useWorkspaceChat(workspaceId: string) {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to broadcast message");
+          const errorText = await response.text().catch(() => "Unknown error");
+          console.error("Broadcast failed:", {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorText,
+            type,
+            workspaceId
+          });
+          // Don't throw for non-critical broadcasts (like typing indicators)
+          if (type !== "typing" && type !== "call_signal") {
+            throw new Error(`Failed to broadcast: ${response.status}`);
+          }
         }
       } catch (error) {
         console.error("Broadcast error:", error);
-        toast.error("Failed to send message");
+        // Only show toast for critical message types
+        if (type === "message" || type === "file") {
+          toast.error("Failed to send message");
+        }
       }
     },
     [workspaceId]
