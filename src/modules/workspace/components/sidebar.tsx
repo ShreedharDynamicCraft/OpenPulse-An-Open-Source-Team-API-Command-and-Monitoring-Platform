@@ -5,7 +5,6 @@ import CreateCollection from '../../collections/components/create-collection';
 import { useCollections } from '@/modules/collections/hooks/collections';
 import EmptyCollections from '../../collections/components/empty-collections';
 import CollectionFolder from '@/modules/collections/components/collection-folder';
-import { WorkspaceChat } from './workspace-chat';
 import { ActivityLogsViewer } from './activity-logs-viewer';
 import { AnalyticsDashboard } from './analytics-dashboard';
 import { ApiCodeEditor } from './api-code-editor';
