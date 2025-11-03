@@ -1,7 +1,7 @@
 "use client";
 
 import { Hint } from "@/components/ui/hint";
-import { Globe, Link as LinkIcon, Code2, Palette, FileCode, Home } from "lucide-react";
+import { Globe, Link as LinkIcon, Code2, Palette, FileCode, Home, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -12,6 +12,7 @@ const TabbedLeftPanel = () => {
 
     const sidebarItems = [
         { icon: Home, label: "home", link: "/" },
+        { icon: MessageSquare, label: "chat", link: "/chat" },
         { icon: LinkIcon, label: "rest", link: "/rest" },
         { icon: Globe, label: "realtime", link: "/realtime" },
         { icon: Palette, label: "design", link: "/design" },

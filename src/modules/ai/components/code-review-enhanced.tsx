@@ -16,7 +16,7 @@ import { WorkspaceChat } from "@/modules/workspace/components/workspace-chat";
 import { CodeReviewLogs } from "./code-review-logs";
 import { CodeReviewProjects } from "./code-review-projects";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { useSession } from "@/lib/auth-client";
+import { useUser } from "@clerk/nextjs";
 
 interface CodeReviewModuleProps {
   workspaceId: string;
@@ -25,7 +25,7 @@ interface CodeReviewModuleProps {
 export function CodeReviewModuleEnhanced({ workspaceId }: CodeReviewModuleProps) {
   const [activeTab, setActiveTab] = useState("empathetic");
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const { user } = useSession();
+  const { user } = useUser();
 
   if (!user) return null;
 
@@ -128,7 +128,15 @@ export function CodeReviewModuleEnhanced({ workspaceId }: CodeReviewModuleProps)
       {/* Right Sidebar - Chat */}
       <ResizablePanel defaultSize={30} minSize={25} maxSize={40}>
         <div className="h-full border-l border-zinc-800 bg-zinc-950">
-          <WorkspaceChat workspaceId={workspaceId} />
+          <WorkspaceChat 
+            workspaceId={workspaceId}
+            currentUser={user ? {
+              id: user.id,
+              name: user.fullName || user.username || "User",
+              email: user.emailAddresses[0]?.emailAddress || "",
+              image: user.imageUrl,
+            } : undefined}
+          />
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

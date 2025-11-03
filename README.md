@@ -31,14 +31,17 @@ It provides a sleek UI and developer-focused workflow to test, monitor, and mana
 - Role-based workspace access (Admin, Member)  
 - View workspace members with overlapping avatars and hover tooltips  
 
-### 🆕 🔹 Collaborative Chat System
-- **Real-time workspace chat** for team collaboration  
-- Discuss API tests, share insights, and coordinate work  
-- **Markdown support** with code syntax highlighting  
-- **Message threading** for organized discussions  
-- **Emoji reactions** (👍, ❤️, 🧠, 🎉, 🔥) on messages  
-- File attachments support  
-- Infinite scroll with automatic updates (polls every 3 seconds)  
+### 🆕 🔹 Real-time Workspace Chat (Enhanced)
+- **Lightning-fast messaging** with Server-Sent Events (SSE)
+- **Instant message delivery** with live connection status
+- **File attachments** - Share images, PDFs, documents, videos (50MB limit)
+- **Image previews** with fullscreen view
+- **Voice calling** - WebRTC-based peer-to-peer audio calls
+- **Online presence** tracking for team members
+- **Mute/unmute** and call controls
+- **Modern UI** with dark mode support and smooth animations
+- **Message history** with pagination
+- **Real-time typing indicators** (infrastructure ready)  
 
 ### 🆕 🔹 AI Code Review (Gemini Integration)
 - **Ask @Gemini** for instant AI assistance  

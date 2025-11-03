@@ -52,7 +52,15 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
       case 'Chat':
         return (
           <div className="flex flex-col h-full w-full overflow-hidden">
-            <WorkspaceChat workspaceId={currentWorkspace?.id} />
+            <WorkspaceChat 
+              workspaceId={currentWorkspace?.id}
+              currentUser={user ? {
+                id: user.id,
+                name: user.fullName || user.username || "User",
+                email: user.emailAddresses[0]?.emailAddress || "",
+                image: user.imageUrl,
+              } : undefined}
+            />
           </div>
         );
       case 'Logs':
