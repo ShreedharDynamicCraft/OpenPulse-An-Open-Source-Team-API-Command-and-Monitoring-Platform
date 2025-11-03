@@ -97,6 +97,12 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
   const [isVideoCallExpanded, setIsVideoCallExpanded] = useState(false);
   const [isVideoCallMinimized, setIsVideoCallMinimized] = useState(false);
   const [videoCallSize, setVideoCallSize] = useState({ width: 400, height: 300 });
+  
+  // Mention feature states
+  const [showMentionDropdown, setShowMentionDropdown] = useState(false);
+  const [mentionSearch, setMentionSearch] = useState("");
+  const [mentionPosition, setMentionPosition] = useState(0);
+  const [filteredMembers, setFilteredMembers] = useState<TeamMember[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -426,10 +432,65 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
     }
   };
 
+  // Handle input change and detect @ mentions
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputMessage(value);
+
+    // Detect @ mention
+    const cursorPosition = e.target.selectionStart || 0;
+    const textBeforeCursor = value.substring(0, cursorPosition);
+    const lastAtSymbol = textBeforeCursor.lastIndexOf("@");
+
+    if (lastAtSymbol !== -1) {
+      const textAfterAt = textBeforeCursor.substring(lastAtSymbol + 1);
+      // Check if there's no space after @ (still typing the mention)
+      if (!textAfterAt.includes(" ")) {
+        setMentionSearch(textAfterAt.toLowerCase());
+        setMentionPosition(lastAtSymbol);
+        setShowMentionDropdown(true);
+        
+        // Filter members based on search
+        const filtered = teamMembers.filter((member) =>
+          member.name.toLowerCase().includes(textAfterAt.toLowerCase()) &&
+          member.id !== currentUser?.id
+        );
+        setFilteredMembers(filtered);
+      } else {
+        setShowMentionDropdown(false);
+      }
+    } else {
+      setShowMentionDropdown(false);
+    }
+  };
+
+  // Insert mention into message
+  const insertMention = (member: TeamMember) => {
+    const beforeMention = inputMessage.substring(0, mentionPosition);
+    const afterMention = inputMessage.substring(mentionPosition + mentionSearch.length + 1);
+    const newMessage = `${beforeMention}@${member.name} ${afterMention}`;
+    setInputMessage(newMessage);
+    setShowMentionDropdown(false);
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
+    // Handle mention dropdown navigation
+    if (showMentionDropdown) {
+      if (e.key === "Escape") {
+        setShowMentionDropdown(false);
+        return;
+      }
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        return; // Could add keyboard navigation through mentions
+      }
+    }
+
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      if (!showMentionDropdown) {
+        handleSendMessage();
+      }
     }
   };
 
@@ -444,6 +505,22 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  };
+
+  // Format message content with bold @mentions
+  const formatMessageWithMentions = (content: string) => {
+    const parts = content.split(/(@\w+)/g);
+    
+    return parts.map((part, index) => {
+      if (part.startsWith("@")) {
+        return (
+          <span key={index} className="font-bold text-indigo-400">
+            {part}
+          </span>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
   };
 
   const renderMessage = (message: ChatMessage) => {
@@ -518,7 +595,7 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
 
           {/* Message Content */}
           <p className="text-sm whitespace-pre-wrap break-words">
-            {message.content}
+            {formatMessageWithMentions(message.content)}
           </p>
 
           {/* Timestamp */}
@@ -891,12 +968,40 @@ export function WorkspaceChat({ workspaceId, currentUser }: WorkspaceChatProps) 
           <div className="flex-1 relative">
             <Input
               value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
+              onChange={handleInputChange}
               onKeyPress={handleKeyPress}
-              placeholder="Type a message..."
+              placeholder="Type a message... (@mention someone)"
               className="pr-10 bg-gray-50 dark:bg-zinc-800"
               disabled={isSendingMessage || !isConnected}
             />
+            
+            {/* Mention Dropdown */}
+            {showMentionDropdown && filteredMembers.length > 0 && (
+              <div className="absolute bottom-full left-0 mb-2 w-full max-w-xs bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg max-h-48 overflow-y-auto z-50">
+                {filteredMembers.map((member) => (
+                  <button
+                    key={member.id}
+                    onClick={() => insertMention(member)}
+                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors text-left"
+                  >
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={member.image} />
+                      <AvatarFallback className="text-xs">
+                        {member.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                        {member.name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {member.email}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <Button
