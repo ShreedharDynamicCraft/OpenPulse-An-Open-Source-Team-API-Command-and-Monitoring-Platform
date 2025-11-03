@@ -2,8 +2,16 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(
-  process.env.GOOGLE_GENERATIVE_AI_API_KEY || ""
+  process.env.GOOGLE_GENERATIVE_AI_API_KEY!
 );
+
+// Default generation config for Gemini 2.0 Flash Exp
+const DEFAULT_GENERATION_CONFIG = {
+  temperature: 0.7,
+  topK: 40,
+  topP: 0.95,
+  maxOutputTokens: 8192,
+};
 
 export interface CodeReviewRequest {
   code: string;
@@ -30,7 +38,10 @@ export async function reviewCode(request: CodeReviewRequest) {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.0-flash-exp",
+      generationConfig: DEFAULT_GENERATION_CONFIG,
+    });
 
     let promptType = "";
     switch (request.type) {
@@ -70,7 +81,7 @@ Provide a detailed analysis in well-structured markdown format.`;
     return {
       success: true,
       content: text,
-      model: "gemini-2.0-flash",
+      model: "gemini-2.0-flash-exp",
     };
   } catch (error: any) {
     console.error("Code review error:", error);
@@ -161,7 +172,7 @@ export async function reviewGitHubRepo(request: GitHubReviewRequest) {
           .join("\n")
       : "No recent commits";
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp", generationConfig: DEFAULT_GENERATION_CONFIG });
 
     const prompt = `You are an expert software architect and code reviewer. Analyze this GitHub repository:
 
@@ -198,7 +209,7 @@ Format your analysis in well-structured markdown.`;
     return {
       success: true,
       content: text,
-      model: "gemini-2.0-flash",
+      model: "gemini-2.0-flash-exp",
       repositoryInfo: {
         name: repoData.full_name,
         description: repoData.description,
@@ -225,7 +236,7 @@ export async function generateChatResponse(
   context?: string
 ) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp", generationConfig: DEFAULT_GENERATION_CONFIG });
 
     const prompt = `You are a helpful AI assistant for an API Testing and Monitoring Platform. 
     
@@ -242,7 +253,7 @@ Provide a helpful, concise, and accurate response. Format your response in markd
     return {
       success: true,
       content: text,
-      model: "gemini-2.0-flash",
+      model: "gemini-2.0-flash-exp",
     };
   } catch (error: any) {
     console.error("Chat AI error:", error);
@@ -270,7 +281,7 @@ export async function analyzeTestResults(data: {
   context?: string;
 }) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp", generationConfig: DEFAULT_GENERATION_CONFIG });
 
     const failedTests = data.testResults.filter(t => t.status !== "success");
     const totalTests = data.testResults.length;
@@ -312,7 +323,7 @@ Format your response in clear, actionable markdown.`;
     return {
       success: true,
       content: text,
-      model: "gemini-2.0-flash",
+      model: "gemini-2.0-flash-exp",
       metrics: {
         totalTests,
         passedTests: totalTests - failedTests.length,
@@ -344,7 +355,7 @@ export async function summarizeApiResponse(data: {
   context?: string;
 }) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp", generationConfig: DEFAULT_GENERATION_CONFIG });
 
     const bodyPreview = typeof data.responseBody === 'string' 
       ? data.responseBody.substring(0, 1000)
@@ -383,7 +394,7 @@ Use simple language that anyone can understand.`;
     return {
       success: true,
       content: text,
-      model: "gemini-2.0-flash",
+      model: "gemini-2.0-flash-exp",
       metadata: {
         method: data.method,
         statusCode: data.statusCode,
@@ -415,7 +426,7 @@ export async function optimizeEndpoint(data: {
   context?: string;
 }) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp", generationConfig: DEFAULT_GENERATION_CONFIG });
 
     const prompt = `You are an API optimization expert. Analyze this endpoint and provide optimization recommendations.
 
@@ -472,7 +483,7 @@ Priority: Focus on the most impactful optimizations first.`;
     return {
       success: true,
       content: text,
-      model: "gemini-2.0-flash",
+      model: "gemini-2.0-flash-exp",
       metrics: {
         responseTime: data.responseTime,
         statusCode: data.statusCode,
@@ -502,7 +513,7 @@ export async function generateTestCasesFromSchema(data: {
   numberOfTests?: number;
 }) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp", generationConfig: DEFAULT_GENERATION_CONFIG });
 
     const numTests = data.numberOfTests || 10;
 
@@ -561,7 +572,7 @@ Generate exactly ${numTests} test cases.`;
       success: true,
       content: text,
       testCases,
-      model: "gemini-2.0-flash",
+      model: "gemini-2.0-flash-exp",
     };
   } catch (error: any) {
     console.error("Schema-based test generation error:", error);
@@ -583,9 +594,27 @@ export async function generateEmpatheticReview(data: {
   language: string;
   comments: string[];
   tone?: "gentle" | "balanced" | "direct";
-  model?: "gemini-2.0-flash" | "gemini-1.5-pro";
+  model?: "gemini-2.0-flash-exp";
 }) {
-  const { code, language, comments, tone = "balanced", model = "gemini-2.0-flash" } = data;
+  const { code, language, comments, tone = "balanced", model = "gemini-2.0-flash-exp" } = data;
+
+  console.log("generateEmpatheticReview called with:", {
+    codeLength: code?.length,
+    language,
+    commentsCount: comments?.length,
+    tone,
+    model,
+    hasApiKey: !!process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  });
+
+  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    console.error("GOOGLE_GENERATIVE_AI_API_KEY is not set");
+    return {
+      success: false,
+      error: "API key not configured",
+      content: null,
+    };
+  }
 
   if (!code || !comments || comments.length === 0) {
     return {
@@ -596,7 +625,10 @@ export async function generateEmpatheticReview(data: {
   }
 
   try {
-    const genModel = genAI.getGenerativeModel({ model });
+    const genModel = genAI.getGenerativeModel({ 
+      model,
+      generationConfig: DEFAULT_GENERATION_CONFIG,
+    });
 
     const toneGuide = {
       gentle: "extremely supportive, encouraging, and kind. Use phrases like 'great start', 'wonderful effort', 'let's explore together'",
@@ -667,8 +699,11 @@ Brief positive summary of the code's strengths and purpose.
 
 **Remember:** Be ${tone} in tone, educational, and always constructive.`;
 
+    console.log("Generating empathetic review with model:", model);
     const result = await genModel.generateContent(prompt);
+    console.log("Gemini API response received");
     const text = result.response.text();
+    console.log("Review generated successfully, length:", text.length);
 
     return {
       success: true,
@@ -682,6 +717,11 @@ Brief positive summary of the code's strengths and purpose.
     };
   } catch (error: any) {
     console.error("Empathetic review generation error:", error);
+    console.error("Error details:", {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+    });
     return {
       success: false,
       error: error.message || "Failed to generate empathetic review",
@@ -698,9 +738,26 @@ export async function reviewGitHubRepository(data: {
   repoUrl: string;
   files: Array<{ path: string; content: string; language: string }>;
   tone?: "gentle" | "balanced" | "direct";
-  model?: "gemini-2.0-flash" | "gemini-1.5-pro";
+  model?: "gemini-2.0-flash-exp";
 }) {
-  const { repoUrl, files, tone = "balanced", model = "gemini-2.0-flash" } = data;
+  const { repoUrl, files, tone = "balanced", model = "gemini-2.0-flash-exp" } = data;
+
+  console.log("reviewGitHubRepository called with:", {
+    repoUrl,
+    filesCount: files?.length,
+    tone,
+    model,
+    hasApiKey: !!process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  });
+
+  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    console.error("GOOGLE_GENERATIVE_AI_API_KEY is not set");
+    return {
+      success: false,
+      error: "API key not configured",
+      content: null,
+    };
+  }
 
   if (!repoUrl || !files || files.length === 0) {
     return {
@@ -719,7 +776,10 @@ export async function reviewGitHubRepository(data: {
   }
 
   try {
-    const genModel = genAI.getGenerativeModel({ model });
+    const genModel = genAI.getGenerativeModel({ 
+      model,
+      generationConfig: DEFAULT_GENERATION_CONFIG,
+    });
 
     const toneGuide = {
       gentle: "extremely supportive and encouraging",

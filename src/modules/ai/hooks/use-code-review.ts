@@ -17,7 +17,7 @@ export function useEmpatheticReview(workspaceId: string) {
       language: string;
       comments: string[];
       tone?: "gentle" | "balanced" | "direct";
-      model?: "gemini-2.0-flash" | "gemini-1.5-pro";
+      model?: "gemini-2.0-flash-exp";
     }) => {
       const result = await generateEmpatheticReviewAction({
         workspaceId,
@@ -42,7 +42,7 @@ export function useGitHubRepoReview(workspaceId: string) {
       repoUrl: string;
       files: Array<{ path: string; content: string; language: string }>;
       tone?: "gentle" | "balanced" | "direct";
-      model?: "gemini-2.0-flash" | "gemini-1.5-pro";
+      model?: "gemini-2.0-flash-exp";
     }) => {
       const result = await reviewGitHubRepositoryAction({
         workspaceId,

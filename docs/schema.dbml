@@ -1,0 +1,534 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id String [pk]
+  name String [not null]
+  email String [unique, not null]
+  emailVerified Boolean [not null, default: false]
+  image String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  workspaces Workspace [not null]
+  memberships WorkspaceMember [not null]
+  workspaceInvites WorkspaceInvite [not null]
+}
+
+Table Workspace {
+  id String [pk]
+  name String [not null]
+  description String
+  ownerId String [not null]
+  owner User [not null]
+  collections Collection [not null]
+  members WorkspaceMember [not null]
+  invites WorkspaceInvite [not null]
+  environments Environment [not null]
+  websocketPresets WebSocketPreset [not null]
+  chatMessages ChatMessage [not null]
+  activityLogs ActivityLog [not null]
+  designProjects DesignProject [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (name, ownerId) [unique]
+  }
+}
+
+Table WorkspaceInvite {
+  id String [pk]
+  workspaceId String [not null]
+  token String [unique, not null]
+  expiresAt DateTime
+  createdById String [not null]
+  workspace Workspace [not null]
+  createdBy User [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table WebSocketPreset {
+  id String [pk]
+  name String [not null]
+  url String [not null]
+  protocols Json
+  params Json
+  workspaceId String
+  workspace Workspace
+  websocketMessages WebsocketMessage [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table WebsocketMessage {
+  id String [pk]
+  presetId String
+  connectionId String
+  direction DIRECTION [not null, default: 'INCOMING']
+  payload String
+  size Int
+  timestamp DateTime [default: `now()`, not null]
+  preset WebSocketPreset
+  meta Json
+}
+
+Table WorkspaceMember {
+  id String [pk]
+  role MEMBER_ROLE [not null, default: 'ADMIN']
+  userId String [not null]
+  workspaceId String [not null]
+  user User [not null]
+  workspace Workspace [not null]
+  roleUpgradeRequests RoleUpgradeRequest [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (userId, workspaceId) [unique]
+  }
+}
+
+Table RoleUpgradeRequest {
+  id String [pk]
+  workspaceId String [not null]
+  requestedById String [not null]
+  requestedRole MEMBER_ROLE [not null]
+  currentRole MEMBER_ROLE [not null]
+  message String
+  status REQUEST_STATUS [not null, default: 'PENDING']
+  reviewedById String
+  reviewedAt DateTime
+  requestedBy WorkspaceMember [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table WorkspaceActivity {
+  id String [pk]
+  workspaceId String [not null]
+  userId String [not null]
+  type ACTIVITY_TYPE [not null]
+  description String [not null]
+  metadata Json
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table Collection {
+  id String [pk]
+  name String [not null]
+  workspaceId String [not null]
+  workspace Workspace [not null]
+  requests Request [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table Request {
+  id String [pk]
+  name String [not null]
+  method REST_METHOD [not null, default: 'GET']
+  url String [not null]
+  parameters Json
+  headers Json
+  body Json
+  response Json
+  collectionId String [not null]
+  collection Collection [not null]
+  runs RequestRun [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table RequestRun {
+  id String [pk]
+  requestId String [not null]
+  request Request [not null]
+  status Int [not null]
+  statusText String
+  headers Json
+  body String
+  durationMs Int
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table Environment {
+  id String [pk]
+  name String [not null]
+  values Json [not null]
+  workspaceId String [not null]
+  workspace Workspace [not null]
+}
+
+Table ChatMessage {
+  id String [pk]
+  workspaceId String [not null]
+  userId String
+  content String [not null]
+  type MessageType [not null, default: 'TEXT']
+  aiResponse Boolean [not null, default: false]
+  aiModel String
+  aiPrompt String
+  codeLanguage String
+  githubUrl String
+  parentId String
+  parent ChatMessage
+  replies ChatMessage [not null]
+  reactions MessageReaction [not null]
+  attachmentUrl String
+  attachmentName String
+  attachmentType String
+  attachmentSize Int
+  deletedForEveryone Boolean [not null, default: false]
+  deletedForUsers Json
+  metadata Json
+  workspace Workspace [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table MessageReaction {
+  id String [pk]
+  messageId String [not null]
+  userId String [not null]
+  emoji String [not null]
+  message ChatMessage [not null]
+  createdAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (messageId, userId, emoji) [unique]
+  }
+}
+
+Table ActivityLog {
+  id String [pk]
+  workspaceId String [not null]
+  userId String
+  type LogType [not null]
+  title String [not null]
+  details Json [not null]
+  status String
+  duration Int
+  statusCode Int
+  requestId String
+  collectionId String
+  relatedChatId String
+  workspace Workspace [not null]
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table CodeReviewProject {
+  id String [pk]
+  workspaceId String [not null]
+  name String [not null]
+  description String
+  createdBy String [not null]
+  sessions CodeReviewSession [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table CodeReviewSession {
+  id String [pk]
+  workspaceId String [not null]
+  userId String [not null]
+  projectId String
+  project CodeReviewProject
+  sessionType ReviewSessionType [not null, default: 'STANDALONE']
+  reviewType ReviewType [not null]
+  name String [not null]
+  description String
+  code String
+  language String
+  filesPaths Json
+  tone String
+  model String [not null]
+  originalComments Json
+  logs CodeReviewLog [not null]
+  tags Json
+  isFavorite Boolean [not null, default: false]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table CodeReviewLog {
+  id String [pk]
+  sessionId String [not null]
+  session CodeReviewSession [not null]
+  response String [not null]
+  model String [not null]
+  tone String
+  duration Int
+  codeSnapshot String
+  commentsSnapshot Json
+  status String [not null, default: 'success']
+  error String
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table DesignProject {
+  id String [pk]
+  workspaceId String [not null]
+  workspace Workspace [not null]
+  name String [not null]
+  description String
+  ownerId String [not null]
+  files DesignFile [not null]
+  permissions DesignPermission [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table DesignFile {
+  id String [pk]
+  projectId String [not null]
+  project DesignProject [not null]
+  title String [not null]
+  description String
+  thumbnailUrl String
+  figmaFileId String [unique]
+  figmaFileKey String
+  figmaNodeId String
+  connectedByUserId String
+  lastSyncedAt DateTime
+  latestVersionId String
+  versions DesignVersion [not null]
+  comments DesignComment [not null]
+  suggestions AISuggestion [not null]
+  permissions DesignPermission [not null]
+  metadata Json
+  tags Json
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table DesignVersion {
+  id String [pk]
+  fileId String [not null]
+  file DesignFile [not null]
+  versionTag String [not null]
+  description String
+  snapshotUrl String
+  thumbnailUrl String
+  metadata Json
+  exports DesignExport [not null]
+  createdBy String [not null]
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table DesignComment {
+  id String [pk]
+  fileId String [not null]
+  file DesignFile [not null]
+  nodeId String
+  positionX Float
+  positionY Float
+  userId String [not null]
+  content String [not null]
+  resolved Boolean [not null, default: false]
+  resolvedBy String
+  resolvedAt DateTime
+  parentId String
+  replies DesignComment [not null]
+  parent DesignComment
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table AISuggestion {
+  id String [pk]
+  fileId String [not null]
+  file DesignFile [not null]
+  nodeId String
+  suggestionType SuggestionType [not null]
+  title String [not null]
+  description String
+  payload Json [not null]
+  accepted Boolean [not null, default: false]
+  acceptedBy String
+  acceptedAt DateTime
+  appliedToVersionId String
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table DesignExport {
+  id String [pk]
+  versionId String [not null]
+  version DesignVersion [not null]
+  format ExportFormat [not null]
+  fileUrl String [not null]
+  fileName String [not null]
+  fileSize Int
+  options Json
+  downloadCount Int [not null, default: 0]
+  createdBy String [not null]
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table DesignPermission {
+  id String [pk]
+  resourceType String [not null]
+  projectId String
+  project DesignProject
+  fileId String
+  file DesignFile
+  userId String [not null]
+  role DesignRole [not null]
+  grantedBy String [not null]
+  grantedAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (resourceType, projectId, fileId, userId) [unique]
+  }
+}
+
+Enum DIRECTION {
+  INCOMING
+  OUTGOING
+}
+
+Enum MEMBER_ROLE {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+Enum REQUEST_STATUS {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+Enum ACTIVITY_TYPE {
+  MEMBER_JOINED
+  MEMBER_LEFT
+  MEMBER_REMOVED
+  ROLE_CHANGED
+  ROLE_REQUESTED
+  ROLE_REQUEST_APPROVED
+  ROLE_REQUEST_REJECTED
+  COLLECTION_CREATED
+  COLLECTION_DELETED
+  REQUEST_CREATED
+  REQUEST_UPDATED
+  REQUEST_DELETED
+  MESSAGE_SENT
+}
+
+Enum REST_METHOD {
+  GET
+  POST
+  PUT
+  PATCH
+  DELETE
+}
+
+Enum MessageType {
+  TEXT
+  CODE
+  FILE
+  SYSTEM
+  AI_RESPONSE
+}
+
+Enum LogType {
+  TEST_RUN
+  COLLECTION_RUN
+  ERROR
+  SYSTEM
+  DEPLOYMENT
+  BUILD
+  API_CALL
+}
+
+Enum ReviewType {
+  EMPATHETIC
+  GITHUB_REPO
+  GENERAL
+}
+
+Enum ReviewSessionType {
+  PROJECT_BASED
+  STANDALONE
+}
+
+Enum DesignRole {
+  OWNER
+  DESIGNER
+  COLLABORATOR
+  VIEWER
+}
+
+Enum ExportFormat {
+  PNG
+  SVG
+  PDF
+  FIG
+  JSON
+  REACT
+}
+
+Enum SuggestionType {
+  COLOR_PALETTE
+  TYPOGRAPHY
+  SPACING
+  ACCESSIBILITY
+  COMPONENT
+  LAYOUT
+  COPY
+}
+
+Ref: Workspace.ownerId > User.id
+
+Ref: WorkspaceInvite.workspaceId > Workspace.id [delete: Cascade]
+
+Ref: WorkspaceInvite.createdById > User.id [delete: Cascade]
+
+Ref: WebSocketPreset.workspaceId > Workspace.id [delete: Set Null]
+
+Ref: WebsocketMessage.presetId > WebSocketPreset.id [delete: Set Null]
+
+Ref: WorkspaceMember.userId > User.id
+
+Ref: WorkspaceMember.workspaceId > Workspace.id
+
+Ref: RoleUpgradeRequest.requestedById > WorkspaceMember.id [delete: Cascade]
+
+Ref: Collection.workspaceId > Workspace.id [delete: Cascade]
+
+Ref: Request.collectionId > Collection.id [delete: Cascade]
+
+Ref: RequestRun.requestId > Request.id [delete: Cascade]
+
+Ref: Environment.workspaceId > Workspace.id [delete: Cascade]
+
+Ref: ChatMessage.parentId - ChatMessage.id [delete: Cascade]
+
+Ref: ChatMessage.workspaceId > Workspace.id [delete: Cascade]
+
+Ref: MessageReaction.messageId > ChatMessage.id [delete: Cascade]
+
+Ref: ActivityLog.workspaceId > Workspace.id [delete: Cascade]
+
+Ref: CodeReviewSession.projectId > CodeReviewProject.id [delete: Cascade]
+
+Ref: CodeReviewLog.sessionId > CodeReviewSession.id [delete: Cascade]
+
+Ref: DesignProject.workspaceId > Workspace.id [delete: Cascade]
+
+Ref: DesignFile.projectId > DesignProject.id [delete: Cascade]
+
+Ref: DesignVersion.fileId > DesignFile.id [delete: Cascade]
+
+Ref: DesignComment.fileId > DesignFile.id [delete: Cascade]
+
+Ref: DesignComment.parentId > DesignComment.id
+
+Ref: AISuggestion.fileId > DesignFile.id [delete: Cascade]
+
+Ref: DesignExport.versionId > DesignVersion.id [delete: Cascade]
+
+Ref: DesignPermission.projectId > DesignProject.id [delete: Cascade]
+
+Ref: DesignPermission.fileId > DesignFile.id [delete: Cascade]

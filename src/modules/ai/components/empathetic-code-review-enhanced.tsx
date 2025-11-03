@@ -46,7 +46,7 @@ export function EmpatheticCodeReviewEnhanced({
   const [comments, setComments] = useState<string[]>([]);
   const [currentComment, setCurrentComment] = useState("");
   const [tone, setTone] = useState<"gentle" | "balanced" | "direct">("balanced");
-  const [model, setModel] = useState<"gemini-2.0-flash" | "gemini-1.5-pro">("gemini-2.0-flash");
+  const model = "gemini-2.0-flash-exp";
   const [copied, setCopied] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
 
@@ -59,7 +59,6 @@ export function EmpatheticCodeReviewEnhanced({
       if (session.code) setCode(session.code);
       if (session.language) setLanguage(session.language);
       if (session.tone) setTone(session.tone as any);
-      if (session.model) setModel(session.model as any);
       if (session.originalComments) {
         setComments(session.originalComments as string[]);
       }
@@ -116,7 +115,6 @@ export function EmpatheticCodeReviewEnhanced({
       comments,
       tone,
       model,
-      sessionId,
     });
   };
 
@@ -159,10 +157,7 @@ export function EmpatheticCodeReviewEnhanced({
     direct: "⚡ Direct - Straightforward but respectful",
   };
 
-  const modelDescriptions = {
-    "gemini-2.0-flash": "⚡ Fast & Efficient - Quick responses for instant feedback",
-    "gemini-1.5-pro": "🧠 Detailed & Thorough - Comprehensive analysis with deeper insights",
-  };
+
 
   return (
     <div className="space-y-6">
@@ -242,32 +237,12 @@ export function EmpatheticCodeReviewEnhanced({
             </div>
           </div>
 
-          {/* AI Model Selection */}
+          {/* AI Model Info */}
           <div className="space-y-2">
             <Label className="text-white text-sm font-semibold">AI Model</Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <button
-                onClick={() => setModel("gemini-2.0-flash")}
-                className={`p-4 rounded-lg border-2 transition-all text-left ${
-                  model === "gemini-2.0-flash"
-                    ? "bg-pink-500/20 border-pink-500 shadow-lg shadow-pink-500/20"
-                    : "bg-zinc-800/50 border-zinc-700 hover:border-zinc-600"
-                }`}
-              >
-                <p className="text-white font-medium mb-1">gemini-2.0-flash</p>
-                <p className="text-xs text-gray-400">{modelDescriptions["gemini-2.0-flash"]}</p>
-              </button>
-              <button
-                onClick={() => setModel("gemini-1.5-pro")}
-                className={`p-4 rounded-lg border-2 transition-all text-left ${
-                  model === "gemini-1.5-pro"
-                    ? "bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20"
-                    : "bg-zinc-800/50 border-zinc-700 hover:border-zinc-600"
-                }`}
-              >
-                <p className="text-white font-medium mb-1">gemini-1.5-pro</p>
-                <p className="text-xs text-gray-400">{modelDescriptions["gemini-1.5-pro"]}</p>
-              </button>
+            <div className="p-4 rounded-lg border-2 bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20">
+              <p className="text-white font-medium mb-1">🧠 gemini-2.0-flash-exp</p>
+              <p className="text-xs text-gray-400">Detailed & Thorough - Comprehensive analysis with deeper insights</p>
             </div>
           </div>
         </CardContent>

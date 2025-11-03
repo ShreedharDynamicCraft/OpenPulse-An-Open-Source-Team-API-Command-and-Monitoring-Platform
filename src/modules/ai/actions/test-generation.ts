@@ -62,7 +62,7 @@ export async function generateTestCases(
     throw new Error("Workspace not found or access denied");
   }
 
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
   const prompt = `You are an expert API testing engineer. Generate ${request.numberOfTests} comprehensive test cases for an API.
 

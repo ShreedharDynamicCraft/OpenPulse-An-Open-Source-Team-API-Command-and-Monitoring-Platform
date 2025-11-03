@@ -15,7 +15,7 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: "PostBoy",
+  title: "OpenPulse",
   description: "A modern API client for developers.",
 };
 

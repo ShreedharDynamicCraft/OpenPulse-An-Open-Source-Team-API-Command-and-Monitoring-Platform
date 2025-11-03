@@ -22,7 +22,7 @@ export function GitHubRepoReview({ workspaceId }: GitHubRepoReviewProps) {
   const [availableFiles, setAvailableFiles] = useState<any[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [tone, setTone] = useState<"gentle" | "balanced" | "direct">("balanced");
-  const [model, setModel] = useState<"gemini-2.0-flash" | "gemini-1.5-pro">("gemini-2.0-flash");
+  const model = "gemini-2.0-flash-exp";
   const [copied, setCopied] = useState(false);
 
   const fetchRepo = useFetchGitHubRepo(workspaceId);
@@ -225,14 +225,9 @@ export function GitHubRepoReview({ workspaceId }: GitHubRepoReviewProps) {
 
             <div className="space-y-2">
               <Label className="text-white font-semibold">AI Model</Label>
-              <select
-                value={model}
-                onChange={(e) => setModel(e.target.value as any)}
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white text-sm"
-              >
-                <option value="gemini-2.0-flash">gemini-2.0-flash (Fast)</option>
-                <option value="gemini-1.5-pro">gemini-1.5-pro (Detailed)</option>
-              </select>
+              <div className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white text-sm">
+                🧠 gemini-2.0-flash-exp
+              </div>
             </div>
           </div>
         )}

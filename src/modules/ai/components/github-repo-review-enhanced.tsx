@@ -30,11 +30,11 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
   const [availableFiles, setAvailableFiles] = useState<any[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [tone, setTone] = useState<"gentle" | "balanced" | "direct">("balanced");
-  const [model, setModel] = useState<"gemini-2.0-flash" | "gemini-1.5-pro">("gemini-2.0-flash");
+  const model = "gemini-2.0-flash-exp";
   const [copied, setCopied] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
 
-  const fetchRepo = useFetchGitHubRepo();
+  const fetchRepo = useFetchGitHubRepo(workspaceId);
   const reviewRepo = useGitHubRepoReview(workspaceId);
   const { data: session } = useCodeReviewSession(selectedSessionId);
 
@@ -46,7 +46,6 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
         setSelectedFiles(new Set(paths));
       }
       if (session.tone) setTone(session.tone as any);
-      if (session.model) setModel(session.model as any);
       // Extract repo URL from description or use a default
       if (session.description && session.description.includes("http")) {
         const urlMatch = session.description.match(/https:\/\/github\.com\/[^\s]+/);
@@ -131,7 +130,6 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
         files: validFiles,
         tone,
         model,
-        sessionId,
       });
     } catch (error) {
       toast.error("Failed to generate review");
@@ -241,28 +239,9 @@ export function GitHubRepoReviewEnhanced({ workspaceId, userId, selectedProject 
             </Button>
           </div>
 
-          {/* Model Selection */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-            <button
-              onClick={() => setModel("gemini-2.0-flash")}
-              className={`p-3 rounded-lg border-2 transition-all text-left ${
-                model === "gemini-2.0-flash"
-                  ? "bg-purple-500/20 border-purple-500"
-                  : "bg-zinc-800/50 border-zinc-700"
-              }`}
-            >
-              <p className="text-white font-medium text-sm">⚡ gemini-2.0-flash</p>
-            </button>
-            <button
-              onClick={() => setModel("gemini-1.5-pro")}
-              className={`p-3 rounded-lg border-2 transition-all text-left ${
-                model === "gemini-1.5-pro"
-                  ? "bg-blue-500/20 border-blue-500"
-                  : "bg-zinc-800/50 border-zinc-700"
-              }`}
-            >
-              <p className="text-white font-medium text-sm">🧠 gemini-1.5-pro</p>
-            </button>
+          {/* Model Info */}
+          <div className="p-3 rounded-lg border-2 bg-blue-500/20 border-blue-500">
+            <p className="text-white font-medium text-sm">🧠 Using: gemini-2.0-flash-exp</p>
           </div>
         </CardContent>
       </Card>

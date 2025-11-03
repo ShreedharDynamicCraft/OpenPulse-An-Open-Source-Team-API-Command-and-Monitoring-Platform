@@ -16,13 +16,25 @@ export async function generateEmpatheticReviewAction(data: {
   language: string;
   comments: string[];
   tone?: "gentle" | "balanced" | "direct";
-  model?: "gemini-2.0-flash" | "gemini-1.5-pro";
+  model?: "gemini-2.0-flash-exp";
 }) {
+  console.log("generateEmpatheticReviewAction called with:", {
+    workspaceId: data.workspaceId,
+    language: data.language,
+    commentsCount: data.comments?.length,
+    codeLength: data.code?.length,
+    tone: data.tone,
+    model: data.model,
+  });
+
   const session = await auth();
 
   if (!session?.userId) {
+    console.error("No user session found");
     throw new Error("Unauthorized");
   }
+
+  console.log("User authenticated:", session.userId);
 
   // Verify workspace access
   const workspace = await db.workspace.findFirst({
@@ -45,13 +57,25 @@ export async function generateEmpatheticReviewAction(data: {
     throw new Error("Workspace not found or access denied");
   }
 
-  return await generateEmpatheticReview({
-    code: data.code,
-    language: data.language,
-    comments: data.comments,
-    tone: data.tone,
-    model: data.model,
-  });
+  try {
+    const result = await generateEmpatheticReview({
+      code: data.code,
+      language: data.language,
+      comments: data.comments,
+      tone: data.tone,
+      model: data.model,
+    });
+
+    if (!result.success) {
+      console.error("Empathetic review error:", result.error);
+      throw new Error(result.error || "Failed to generate empathetic review");
+    }
+
+    return result;
+  } catch (error: any) {
+    console.error("generateEmpatheticReviewAction error:", error);
+    throw error;
+  }
 }
 
 /**
@@ -62,7 +86,7 @@ export async function reviewGitHubRepositoryAction(data: {
   repoUrl: string;
   files: Array<{ path: string; content: string; language: string }>;
   tone?: "gentle" | "balanced" | "direct";
-  model?: "gemini-2.0-flash" | "gemini-1.5-pro";
+  model?: "gemini-2.0-flash-exp";
 }) {
   const session = await auth();
 
@@ -91,12 +115,24 @@ export async function reviewGitHubRepositoryAction(data: {
     throw new Error("Workspace not found or access denied");
   }
 
-  return await reviewGitHubRepository({
-    repoUrl: data.repoUrl,
-    files: data.files,
-    tone: data.tone,
-    model: data.model,
-  });
+  try {
+    const result = await reviewGitHubRepository({
+      repoUrl: data.repoUrl,
+      files: data.files,
+      tone: data.tone,
+      model: data.model,
+    });
+
+    if (!result.success) {
+      console.error("GitHub review error:", result.error);
+      throw new Error(result.error || "Failed to review GitHub repository");
+    }
+
+    return result;
+  } catch (error: any) {
+    console.error("reviewGitHubRepositoryAction error:", error);
+    throw error;
+  }
 }
 
 /**
