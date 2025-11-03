@@ -8,6 +8,7 @@ import CollectionFolder from '@/modules/collections/components/collection-folder
 import { ActivityLogsViewer } from './activity-logs-viewer';
 import { AnalyticsDashboard } from './analytics-dashboard';
 import { ApiCodeEditor } from './api-code-editor';
+import { WorkspaceChat } from './workspace-chat';
 import { useUser } from '@clerk/nextjs';
 
 
