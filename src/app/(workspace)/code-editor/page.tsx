@@ -30,7 +30,8 @@ import {
   BookOpen,
   Search,
   RefreshCw,
-  CheckCircle
+  CheckCircle,
+  X
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
@@ -86,6 +87,7 @@ export default function CodeEditorPage() {
   // Editor
   const [copied, setCopied] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showWelcomeCard, setShowWelcomeCard] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -1139,16 +1141,26 @@ public class ApiController {
                 {/* Code Editor Area with VS Code Theme */}
                 <div className="flex-1 overflow-y-auto overflow-x-auto bg-white dark:bg-[#1e1e1e] relative" style={{ maxHeight: 'calc(100vh - 180px)' }}>
                   {/* Welcome Card for Empty Editor */}
-                  {!code && (
+                  {!code && showWelcomeCard && (
                     <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-10 w-96 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg p-4">
                       <div className="flex items-start gap-3">
                         <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                           <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-                            Welcome to AI Code Editor!
-                          </h3>
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                              Welcome to AI Code Editor!
+                            </h3>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setShowWelcomeCard(false)}
+                              className="h-6 w-6 p-0 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                            >
+                              <X className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
+                            </Button>
+                          </div>
                           <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-3">
                             Get started with professional code templates and AI assistance
                           </p>
