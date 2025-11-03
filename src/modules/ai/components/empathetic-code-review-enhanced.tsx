@@ -108,14 +108,33 @@ export function EmpatheticCodeReviewEnhanced({
       }
     }
 
-    setStartTime(Date.now());
-    empatheticReview.mutate({
-      code,
+    console.log("Calling empathetic review mutation with:", {
+      codeLength: code.length,
       language,
-      comments,
+      commentsCount: comments.length,
       tone,
       model,
     });
+
+    setStartTime(Date.now());
+    empatheticReview.mutate(
+      {
+        code,
+        language,
+        comments,
+        tone,
+        model,
+      },
+      {
+        onSuccess: (data) => {
+          console.log("Empathetic review success:", data);
+        },
+        onError: (error) => {
+          console.error("Empathetic review mutation error:", error);
+          toast.error(`Failed to generate empathetic review: ${error.message}`);
+        },
+      }
+    );
   };
 
   // Save to logs when review is generated

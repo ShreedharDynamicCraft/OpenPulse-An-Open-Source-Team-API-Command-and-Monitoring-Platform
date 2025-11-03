@@ -40,12 +40,20 @@ export function useWorkspaceChat(workspaceId: string) {
       };
 
       eventSource.onerror = (error) => {
-        console.error("SSE error:", error);
-        setIsConnected(false);
-        eventSource.close();
-
-        // Reconnect after 3 seconds
-        setTimeout(connectSSE, 3000);
+        console.error("SSE connection error for workspace:", workspaceId);
+        console.error("EventSource readyState:", eventSource.readyState);
+        
+        // Only log and reconnect if actually disconnected
+        if (eventSource.readyState === EventSource.CLOSED) {
+          console.log("SSE connection closed, will attempt to reconnect...");
+          setIsConnected(false);
+          eventSource.close();
+          
+          // Reconnect after 3 seconds
+          setTimeout(connectSSE, 3000);
+        } else if (eventSource.readyState === EventSource.CONNECTING) {
+          console.log("SSE connecting...");
+        }
       };
 
       eventSourceRef.current = eventSource;

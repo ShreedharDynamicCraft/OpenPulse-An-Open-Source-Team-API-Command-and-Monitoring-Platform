@@ -564,7 +564,7 @@ export default function CodeEditorPage() {
             </TabsContent>
 
             {/* Analysis Tab */}
-            <TabsContent value="analysis" className="flex-1 m-0 p-4 overflow-auto space-y-4">
+            <TabsContent value="analysis" className="flex-1 m-0 p-4 overflow-y-auto overflow-x-hidden space-y-4" style={{ maxHeight: 'calc(100vh - 200px)' }}>
               {/* Code Analysis Card */}
               <Card className="bg-zinc-900 border-zinc-800">
                 <CardHeader>
@@ -743,7 +743,7 @@ export default function CodeEditorPage() {
                         {test.requestBody && (
                           <div className="space-y-1">
                             <p className="text-xs text-zinc-500">Request Body:</p>
-                            <pre className="bg-zinc-900 p-2 rounded text-xs overflow-auto">
+                            <pre className="bg-zinc-900 p-2 rounded text-xs overflow-auto max-h-[200px]">
                               {JSON.stringify(test.requestBody, null, 2)}
                             </pre>
                           </div>
@@ -753,7 +753,7 @@ export default function CodeEditorPage() {
                         {test.expectedResponse && (
                           <div className="space-y-1">
                             <p className="text-xs text-zinc-500">Expected Response:</p>
-                            <pre className="bg-zinc-900 p-2 rounded text-xs overflow-auto">
+                            <pre className="bg-zinc-900 p-2 rounded text-xs overflow-auto max-h-[200px]">
                               {JSON.stringify(test.expectedResponse, null, 2)}
                             </pre>
                           </div>
@@ -870,7 +870,7 @@ export default function CodeEditorPage() {
             </TabsContent>
 
             {/* Security Tab */}
-            <TabsContent value="security" className="flex-1 m-0 p-4 overflow-auto space-y-4">
+            <TabsContent value="security" className="flex-1 m-0 p-4 overflow-y-auto overflow-x-hidden space-y-4" style={{ maxHeight: 'calc(100vh - 200px)' }}>
               <Card className="bg-zinc-900 border-zinc-800">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
@@ -974,7 +974,7 @@ export default function CodeEditorPage() {
             </TabsContent>
 
             {/* Performance Tab */}
-            <TabsContent value="performance" className="flex-1 m-0 p-4 overflow-auto space-y-4">
+            <TabsContent value="performance" className="flex-1 m-0 p-4 overflow-y-auto overflow-x-hidden space-y-4" style={{ maxHeight: 'calc(100vh - 200px)' }}>
               <Card className="bg-zinc-900 border-zinc-800">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
@@ -1059,7 +1059,7 @@ export default function CodeEditorPage() {
             </TabsContent>
 
             {/* Documentation Tab */}
-            <TabsContent value="docs" className="flex-1 m-0 p-4 overflow-auto space-y-4">
+            <TabsContent value="docs" className="flex-1 m-0 p-4 overflow-y-auto overflow-x-hidden space-y-4" style={{ maxHeight: 'calc(100vh - 200px)' }}>
               <Card className="bg-zinc-900 border-zinc-800">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">

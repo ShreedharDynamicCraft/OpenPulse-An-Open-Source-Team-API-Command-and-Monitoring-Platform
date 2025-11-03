@@ -287,7 +287,15 @@ Return ONLY a JSON object with this structure:
 
 export async function generateEndpointTests(endpoint: any) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-2.0-flash-exp',
+      generationConfig: {
+        temperature: 0.3, // Lower temperature for more consistent JSON
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 8192,
+      }
+    });
 
     const systemPrompt = `You are an API testing expert. Generate comprehensive test scenarios for the specific endpoint.
 
@@ -304,7 +312,9 @@ Generate realistic test cases including:
 - Error scenarios
 - Authentication tests (if required)
 
-Return ONLY a JSON object with this structure:
+IMPORTANT: Return ONLY valid JSON. No additional text, explanations, or comments. Just the JSON object.
+
+Return this exact structure:
 {
   "testCases": [
     {
@@ -312,24 +322,63 @@ Return ONLY a JSON object with this structure:
       "description": "what it tests",
       "method": "HTTP method",
       "path": "endpoint path",
-      "headers": {"header": "value"},
-      "body": "request body if applicable",
+      "headers": {},
+      "body": null,
       "expectedStatus": 200,
-      "expectedResponse": "expected response structure or message",
-      "testType": "success|error|edge-case|auth"
+      "expectedResponse": "expected response",
+      "testType": "success"
     }
   ],
   "mockData": {
     "valid": "valid test data",
-    "invalid": "invalid test data for error testing"
+    "invalid": "invalid test data"
   }
 }`;
 
     const result = await model.generateContent([systemPrompt]);
 
     const text = result.response.text();
-    const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    const data = JSON.parse(cleanedText);
+    console.log('Raw AI response for endpoint tests:', text.substring(0, 500));
+    
+    // Clean the response
+    let cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
+    // Try to extract JSON if there's extra text
+    const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      cleanedText = jsonMatch[0];
+    }
+    
+    console.log('Cleaned text for parsing:', cleanedText.substring(0, 500));
+    
+    let data;
+    try {
+      data = JSON.parse(cleanedText);
+    } catch (parseError: any) {
+      console.error('JSON parse error:', parseError.message);
+      console.error('Failed to parse text:', cleanedText);
+      
+      // Return a fallback structure
+      return { 
+        success: true, 
+        data: {
+          testCases: [
+            {
+              name: "Basic Test",
+              description: "Test the endpoint",
+              method: endpoint.method,
+              path: endpoint.path,
+              expectedStatus: 200,
+              testType: "success"
+            }
+          ],
+          mockData: {
+            valid: "Test data generation failed - manual input required",
+            invalid: "Test data generation failed - manual input required"
+          }
+        }
+      };
+    }
 
     return { success: true, data };
   } catch (error: any) {
